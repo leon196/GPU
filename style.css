@@ -5,6 +5,11 @@
     color: #ffffff;
 }
 
+body
+{
+    background: url("img/background.jpg");
+}
+
 canvas 
 {
     display: block;

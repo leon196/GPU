@@ -4,6 +4,9 @@ var Engine = {};
 Engine.renderer;
 Engine.canvas;
 Engine.scene;
+Engine.isPlaying = false;
+Engine.isStarting = false;
+Engine.isWinning = false;
 Engine.isRestarting = false;
 
 Engine.Setup = function ()
@@ -16,6 +19,9 @@ Engine.Setup = function ()
 
     // Main Scene
     Engine.scene = new Scene();
+
+    // Render Texture
+    Engine.renderTexture = new PIXI.RenderTexture(Engine.renderer, Screen.size.width, Screen.size.height); 
 
     // Mouse Events
     Engine.scene.touchmove = Engine.scene.mousemove = Input.MouseMove;
@@ -37,14 +43,16 @@ Engine.Setup = function ()
     // Load Asset
     Asset.LoadAndSetup(function(loader, res)
     {
-        // Setup Scene
-        Engine.scene.Setup();
+        // 
+        Text.Setup();
+
+        Player.Init();
 
         // Setup Filters
         Filter.Setup(res);
 
-        // Add Filters
-        Engine.scene.filters = [Filter.TVFilter];
+        // Setup Scene
+        Engine.scene.Setup();
 
         // Add Canvas
         Engine.canvas = document.getElementById("canvas");
@@ -54,11 +62,96 @@ Engine.Setup = function ()
 
 Engine.Update = function ()
 {
-    Player.Update();
-
+    // Update Scene
     Engine.scene.Update();
 
-    Filter.Update();
+    // Play
+    if (Engine.isPlaying && Engine.isWinning == false)
+    {
+        // Introduction
+        if (Engine.isStarting)
+        {
+            var ratioStart = animationRatio(Time.startingStarted, Time.startingDelay, Time.GetElapsed());
+
+            Player.Rumbling(ratioStart);
+
+            if (ratioStart >= 1.0)
+            {
+                Engine.isStarting = false;
+            }
+        }
+        // Check Win
+        else if (Player.DoesParameterDifferenceIsLessThan(0.1) && Engine.isWinning == false)
+        {
+            Engine.Win();
+        }
+
+        // Update
+        Player.Update();
+        Filter.Update();
+    }
+
+    // Start
+    else if (Input.mousePressed)
+    {
+        Engine.isPlaying = true;
+        Engine.StartLevel();
+    }
+
+    // Win Animation
+    if (Engine.isWinning)
+    {
+        var ratioWin = animationRatio(Time.winningStarted, Time.winningDelay, Time.GetElapsed());
+
+        Text.DrawText("AWESOME!", smoothstep(0.0, 0.25, ratioWin));
+
+        if (ratioWin >= 1.0)
+        {
+            Engine.isWinning = false;
+            Engine.NextLevel();
+        }
+    }
 
     Engine.renderer.render( Engine.scene );
+};
+
+Engine.StartLevel = function ()
+{
+    Engine.scene.Start();
+    Player.Rumble();
+    Engine.isStarting = true;
+    Time.startingStarted = Time.GetElapsed();
+};
+
+Engine.NextLevel = function ()
+{
+    Filter.currentFilterIndex++;
+    // Game Finished
+    if (Filter.currentFilterIndex == Filter.filters.length)
+    {
+
+    }
+    else
+    {
+        Engine.scene.Start();
+        Player.Rumble();
+        Engine.isStarting = true;
+        Time.startingStarted = Time.GetElapsed();
+        Text.Clear();
+    }
+};
+
+Engine.Restart = function ()
+{
+    Engine.scene.Restart();
+    Engine.StartLevel();
+    Text.Clear();
+};
+
+Engine.Win = function ()
+{
+    Time.winningStarted = Time.GetElapsed();
+    Engine.isWinning = true;
+    Text.Clear();
+    Player.Clear();
 };
