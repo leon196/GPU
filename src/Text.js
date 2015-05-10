@@ -10,6 +10,16 @@ Text.Setup = function ()
 	Text.container = new PIXI.Container();
 };
 
+Text.bravoCurrentIndex = 0;
+Text.bravoList = ["AWESOME!", "SHADERIFIC!", "GLITCHY!", "AYAYAYE!"];
+Text.NextBravo = function ()
+{
+	Text.bravoCurrentIndex = (Text.bravoCurrentIndex + 1) % Text.bravoList.length;
+};
+Text.GetBravo = function ()
+{
+	return Text.bravoList[Text.bravoCurrentIndex];
+};
 
 Text.DrawText = function (textToDraw, ratio)
 {
@@ -23,10 +33,10 @@ Text.DrawText = function (textToDraw, ratio)
 		Engine.scene.removeChild(Text.bitmapTextWhite);
 	}
 
-	var scale = 16.0 + Math.floor(ratio * 512.0);
+	var scale = 16.0 + Math.floor(ratio * 256.0);
 
-	Text.bitmapText = new PIXI.extras.BitmapText(textToDraw, { font: scale + "px Generally Speaking", tint: ColorHex.GetRainbow(1.0 - ratio)}); 
-	Text.bitmapTextWhite = new PIXI.extras.BitmapText(textToDraw, { font: scale + "px Generally Speaking", tint: 0xffffff}); 
+	Text.bitmapText = new PIXI.extras.BitmapText(textToDraw, { font: scale + "px Nervous", tint: ColorHex.Rainbow() });//ColorHex.GetRainbow(1.0 - ratio)}); 
+	Text.bitmapTextWhite = new PIXI.extras.BitmapText(textToDraw, { font: scale + "px Nervous", tint: 0xffffff}); 
 
 	Text.bitmapText.x = Screen.size.width / 2 - Text.bitmapText.textWidth / 2;
 	Text.bitmapText.y = mix(Screen.size.height, Screen.size.height / 2 - Text.bitmapTextWhite.textHeight / 2, ratio);

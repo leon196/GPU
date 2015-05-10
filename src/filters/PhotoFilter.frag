@@ -46,7 +46,7 @@ void main( void )
 	color = mix(color, mix(color, vec3(rand(uv), rand(vec2(angle)), rand(vec2(radius))), 0.5), abs(uParameter3));
 
 	// Exposure
-	color += abs(uParameter4) * 0.5;
+	color -= abs(uParameter4) * 0.5;
     
     gl_FragColor = vec4( color, 1.0 );
 }

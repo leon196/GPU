@@ -54,40 +54,77 @@ Input.keyX = false;
 Input.keyC = false;
 Input.keyY = false;
 Input.keyU = false;
+Input.keyH = false;
+Input.keyJ = false;
+Input.keyK = false;
+Input.keyL = false;
+Input.keyI = false;
+Input.keyO = false;
+
+Input.keyCodes = [[70, 71], [82, 84], [86, 66], [88, 67], [89, 85], [72, 74], [75, 76], [73, 79]];
+
+Input.Rumble = function ()
+{
+    Input.keyCodes = shuffle(Input.keyCodes);
+};
 
 Input.KeyDown = function (event)
 {
 	switch (event.keyCode)
 	{
-        case 70: Input.keyF = true; break;
-        case 71: Input.keyG = true; break;
-		case 82: Input.keyR = true; break;
-        case 84: Input.keyT = true; break;
-        case 86: Input.keyV = true; break;
-        case 66: Input.keyB = true; break;
-        case 88: Input.keyX = true; break;
-        case 67: Input.keyC = true; break;
-        case 89: Input.keyY = true; break;
-        case 85: Input.keyU = true; break;
-	}
+        case Input.keyCodes[0][0]: Input.keyF = true; break;
+        case Input.keyCodes[0][1]: Input.keyG = true; break;
 
-    console.log(event.keyCode);
+		case Input.keyCodes[1][0]: Input.keyR = true; break;
+        case Input.keyCodes[1][1]: Input.keyT = true; break;
+
+        case Input.keyCodes[2][0]: Input.keyV = true; break;
+        case Input.keyCodes[2][1]: Input.keyB = true; break;
+
+        case Input.keyCodes[3][0]: Input.keyX = true; break;
+        case Input.keyCodes[3][1]: Input.keyC = true; break;
+
+        case Input.keyCodes[4][0]: Input.keyY = true; break;
+        case Input.keyCodes[4][1]: Input.keyU = true; break;
+
+        case Input.keyCodes[5][0]: Input.keyH = true; break;
+        case Input.keyCodes[5][1]: Input.keyJ = true; break;
+
+        case Input.keyCodes[6][0]: Input.keyK = true; break;
+        case Input.keyCodes[6][1]: Input.keyL = true; break;
+
+        case Input.keyCodes[7][0]: Input.keyI = true; break;
+        case Input.keyCodes[7][1]: Input.keyO = true; break;
+	}
 }
 
 Input.KeyUp = function (event)
 {
 	switch (event.keyCode)
 	{
-        case 70: Input.keyF = false; break;
-        case 71: Input.keyG = false; break;
-		case 82: Input.keyR = false; break;
-        case 84: Input.keyT = false; break;
-        case 86: Input.keyV = false; break;
-        case 66: Input.keyB = false; break;
-        case 88: Input.keyX = false; break;
-        case 67: Input.keyC = false; break;
-        case 89: Input.keyY = false; break;
-        case 85: Input.keyU = false; break;
+        case Input.keyCodes[0][0]: Input.keyF = false; break;
+        case Input.keyCodes[0][1]: Input.keyG = false; break;
+
+		case Input.keyCodes[1][0]: Input.keyR = false; break;
+        case Input.keyCodes[1][1]: Input.keyT = false; break;
+
+        case Input.keyCodes[2][0]: Input.keyV = false; break;
+        case Input.keyCodes[2][1]: Input.keyB = false; break;
+
+        case Input.keyCodes[3][0]: Input.keyX = false; break;
+        case Input.keyCodes[3][1]: Input.keyC = false; break;
+
+        case Input.keyCodes[4][0]: Input.keyY = false; break;
+        case Input.keyCodes[4][1]: Input.keyU = false; break;
+
+        case Input.keyCodes[5][0]: Input.keyH = false; break;
+        case Input.keyCodes[5][1]: Input.keyJ = false; break;
+
+        case Input.keyCodes[6][0]: Input.keyK = false; break;
+        case Input.keyCodes[6][1]: Input.keyL = false; break;
+
+        case Input.keyCodes[7][0]: Input.keyI = false; break;
+        case Input.keyCodes[7][1]: Input.keyO = false; break;
 	}
 }
 

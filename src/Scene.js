@@ -29,6 +29,7 @@ var Scene = function()
 
     this.Setup = function ()
     { 
+        this.title.filters = [Filter.TitleFilter];
     };
 
     this.Start = function ()

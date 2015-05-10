@@ -16,6 +16,32 @@ Engine.Setup = function ()
     {
         resolution: 1.0
     });
+    Engine.renderer.view.ondragover = function(e) {
+        e.preventDefault();
+        return false;
+    };
+    Engine.renderer.view.ondrop = function(e) {
+        e.preventDefault();
+        var file = e.dataTransfer.files[0],
+            reader = new FileReader();
+        reader.onload = function(event) {
+            var img = new Image(),
+                imgStr = event.target.result;
+            //state.innerHTML += ' Image Uploaded: <a href="' +
+                //imgStr + '" target="_blank">view image</a><br />';
+            img.src = event.target.result;
+            img.onload = function(event) {
+                Engine.scene.removeChild(Engine.scene.photo);
+                Engine.scene.photo = new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(this)));
+                Engine.scene.photo.width = Screen.size.width;
+                Engine.scene.photo.height = Screen.size.height;
+                Engine.scene.addChildAt(Engine.scene.photo, 1);
+                //state.innerHTML += ' Canvas Loaded: <a href="' + canvas.toDataURL() + '" target="_blank">view canvas</a><br />';
+            };
+        };
+        reader.readAsDataURL(file);
+        return false;
+    };
 
     // Main Scene
     Engine.scene = new Scene();
@@ -68,6 +94,10 @@ Engine.Update = function ()
     // Play
     if (Engine.isPlaying && Engine.isWinning == false)
     {
+        // Update
+        Player.Update();
+        Filter.Update();
+
         // Introduction
         if (Engine.isStarting)
         {
@@ -81,18 +111,14 @@ Engine.Update = function ()
             }
         }
         // Check Win
-        else if (Player.DoesParameterDifferenceIsLessThan(0.1) && Engine.isWinning == false)
+        else if (Input.keyR || (Player.DoesParameterDifferenceIsLessThan(0.05) && Engine.isWinning == false))
         {
             Engine.Win();
         }
-
-        // Update
-        Player.Update();
-        Filter.Update();
     }
 
     // Start
-    else if (Input.mousePressed)
+    else if (Input.mousePressed && Engine.isPlaying == false)
     {
         Engine.isPlaying = true;
         Engine.StartLevel();
@@ -103,11 +129,10 @@ Engine.Update = function ()
     {
         var ratioWin = animationRatio(Time.winningStarted, Time.winningDelay, Time.GetElapsed());
 
-        Text.DrawText("AWESOME!", smoothstep(0.0, 0.25, ratioWin));
+        Text.DrawText(Text.GetBravo(), smoothstep(0.0, 0.25, ratioWin));
 
         if (ratioWin >= 1.0)
         {
-            Engine.isWinning = false;
             Engine.NextLevel();
         }
     }
@@ -119,26 +144,32 @@ Engine.StartLevel = function ()
 {
     Engine.scene.Start();
     Player.Rumble();
+    Input.Rumble();
     Engine.isStarting = true;
     Time.startingStarted = Time.GetElapsed();
 };
 
 Engine.NextLevel = function ()
 {
-    Filter.currentFilterIndex++;
     // Game Finished
-    if (Filter.currentFilterIndex == Filter.filters.length)
+    if (Filter.currentFilterIndex < Filter.filters.length - 1)
     {
-
-    }
-    else
-    {
+        Engine.isWinning = false;
+        Filter.currentFilterIndex++;
+        Filter.SetParameterCount();
         Engine.scene.Start();
         Player.Rumble();
         Engine.isStarting = true;
         Time.startingStarted = Time.GetElapsed();
-        Text.Clear();
+        
     }
+    else
+    {
+        Engine.isWinning = true;
+        Time.winningStarted = Time.GetElapsed();
+    }
+    Text.Clear();
+    Text.NextBravo();
 };
 
 Engine.Restart = function ()
@@ -154,4 +185,5 @@ Engine.Win = function ()
     Engine.isWinning = true;
     Text.Clear();
     Player.Clear();
+    Filter.Update();
 };
