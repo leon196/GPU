@@ -111,7 +111,7 @@ Engine.Update = function ()
             }
         }
         // Check Win
-        else if (Input.keyR || (Player.DoesParameterDifferenceIsLessThan(0.05) && Engine.isWinning == false))
+        else if (Player.DoesParameterDifferenceIsLessThan(0.05) && Engine.isWinning == false)
         {
             Engine.Win();
         }

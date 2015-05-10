@@ -38,13 +38,13 @@ ColorHex.Gray90 = 0x262626;
 ColorHex.Gray95 = 0x111111;
 ColorHex.Black = 0x000000;
 
-/*
+
 ColorHex.colors = [ColorHex.Red, ColorHex.RedOrange, ColorHex.YellowOrange, ColorHex.Yellow, ColorHex.PeaGreen, ColorHex.YellowGreen, 
 ColorHex.Green, ColorHex.GreenCyan, ColorHex.Cyan, ColorHex.CyanBlue, ColorHex.Blue, ColorHex.BlueViolet, ColorHex.Violet, 
 ColorHex.VioletMagenta, ColorHex.Magenta, ColorHex.MagentaRed];
-*/
 
-ColorHex.colors = [ColorHex.Green, ColorHex.Cyan, ColorHex.Magenta];
+
+/*ColorHex.colors = [ColorHex.Green, ColorHex.Cyan, ColorHex.Magenta];*/
 
 ColorHex.colorsMountain = [ColorHex.White, ColorHex.Gray15, ColorHex.Gray30, ColorHex.PeaGreen, ColorHex.YellowGreen, ColorHex.Green, ColorHex.GreenCyan];
 ColorHex.colorsGreen = [0x00ff00, 0x00e500, 0x00cc00, 0x00b200, 0x009900, 0x007f00, 0x006600, 0x004c00, 0x003300, 0x001900, 0x000000];
