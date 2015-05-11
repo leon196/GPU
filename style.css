@@ -2,12 +2,8 @@
 {
     padding: 0;
     margin: 0;
-    color: #ffffff;
-}
-
-body
-{
-    background: url("img/background.jpg");
+    color: #ff0000;
+    font-family: Flaticon;
 }
 
 canvas 
@@ -20,4 +16,10 @@ canvas
     bottom: 0;
     width: 100%;
     margin: 0 auto;
+}
+
+#font
+{
+    font-family: Flaticon;
+    visibility: hidden;
 }

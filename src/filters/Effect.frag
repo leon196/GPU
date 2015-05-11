@@ -9,6 +9,8 @@ uniform vec2 uTarget;
 varying vec2 vTextureCoord;
 uniform sampler2D uSampler;
 uniform float uTimeElapsed;
+uniform float uParameter1;
+uniform float uParameter2;
 
 // Dat random function for glsl
 float rand(vec2 co){ return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
@@ -23,11 +25,11 @@ float luminance ( vec3 color ) { return (color.r + color.g + color.b) / 3.0; }
 // Raymarching
 const float rayEpsilon = 0.01;
 const float rayMin = 0.1;
-const float rayMax = 100000.0;
-const int rayCount = 32;
+const float rayMax = 1000.0;
+const int rayCount = 4;
 
 // Camera
-vec3 eye = vec3(0.0, 1.0, -1.5);
+vec3 eye = vec3(0.0, 0.0, -1.5);
 vec3 front = vec3(0.0, 0.0, 1.0);
 vec3 right = vec3(1.0, 0.0, 0.0);
 vec3 up = vec3(0.0, 1.0, 0.0);
@@ -125,18 +127,21 @@ void main( void )
         // Ray Position
         vec3 p = eye + ray * t;
         
-        p -= noise(p * 2.0 + uTimeElapsed * 0.1);
-        
-        p -= noise(p * 20.0) * 0.1;
-        
         // Distance to Sphere
-        float d = scene(p);
+        float n1 = 0.5 * noise(normalize(p) * 20.0 + uTimeElapsed * 0.1);
+        float n2 = 0.1 * noise(normalize(p) * 40.0 + uTimeElapsed * 0.1);
+
+        vec3 pp = mod(p, 2.0) - 1.0;
+
+        p = mix(p, pp, abs(uParameter2));
+
+        float d = sphere(p, 0.5 + (n1 + n2) * abs(uParameter1));
         
         // Distance min or max reached
         if (d < rayEpsilon || t > rayMax)
         {
             // Shadow from ray count
-            color = mix(sphereColor, shadowColor, float(r) / float(rayCount));
+            color = mix(normalize(p) * 0.5 + 0.5, shadowColor, float(r) / float(rayCount));
             // Sky color from distance
             color = mix(color, skyColor, smoothstep(rayMin, rayMax, t));
             break;
@@ -149,10 +154,6 @@ void main( void )
 
         // Distance field step
         t += d;
-    }
-    
-    
-    
+    }    
     gl_FragColor = vec4( color, 1.0 );
-
 }

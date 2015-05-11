@@ -1,4 +1,4 @@
-function DistortionFilter(fragmentSource)
+function LSDFilter2(fragmentSource)
 {
     PIXI.AbstractFilter.call(this,
         // vertex shader
@@ -9,15 +9,18 @@ function DistortionFilter(fragmentSource)
         {
             uTimeElapsed : {type : '1f', value : 0}
             , uResolution : {type : '2f', value: [0, 0]}
+
             , uParameter1 : {type : '1f', value: 0}
             , uParameter2 : {type : '1f', value: 0}
             , uParameter3 : {type : '1f', value: 0}
             , uParameter4 : {type : '1f', value: 0}
             , uParameter5 : {type : '1f', value: 0}
             , uParameter6 : {type : '1f', value: 0}
+
+            , uParameterCount : {type: "1i", value: 2}
         }
     );
 }
 
-DistortionFilter.prototype = Object.create(PIXI.AbstractFilter.prototype);
-DistortionFilter.prototype.constructor = DistortionFilter;
+LSDFilter2.prototype = Object.create(PIXI.AbstractFilter.prototype);
+LSDFilter2.prototype.constructor = LSDFilter2;

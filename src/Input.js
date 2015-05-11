@@ -46,22 +46,31 @@ Input.MouseUp = function(mouseData)
 // Keys
 Input.keyF = false;
 Input.keyG = false;
+
 Input.keyR = false;
 Input.keyT = false;
+
 Input.keyV = false;
 Input.keyB = false;
+
 Input.keyX = false;
 Input.keyC = false;
+
 Input.keyY = false;
 Input.keyU = false;
+
 Input.keyH = false;
 Input.keyJ = false;
+
 Input.keyK = false;
 Input.keyL = false;
+
 Input.keyI = false;
 Input.keyO = false;
 
 Input.keyCodes = [[70, 71], [82, 84], [86, 66], [88, 67], [89, 85], [72, 74], [75, 76], [73, 79]];
+
+Input.anyKey = false;
 
 Input.Rumble = function ()
 {
@@ -96,6 +105,7 @@ Input.KeyDown = function (event)
         case Input.keyCodes[7][0]: Input.keyI = true; break;
         case Input.keyCodes[7][1]: Input.keyO = true; break;
 	}
+    Input.anyKey = true;
 }
 
 Input.KeyUp = function (event)
@@ -126,6 +136,7 @@ Input.KeyUp = function (event)
         case Input.keyCodes[7][0]: Input.keyI = false; break;
         case Input.keyCodes[7][1]: Input.keyO = false; break;
 	}
+    Input.anyKey = false;
 }
 
 // Keyboard Event

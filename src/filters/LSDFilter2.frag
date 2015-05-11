@@ -11,6 +11,10 @@ uniform float uTimeElapsed;
 
 uniform float uParameter1;
 uniform float uParameter2;
+uniform float uParameter3;
+uniform float uParameter4;
+uniform float uParameter5;
+uniform float uParameter6;
 
 // Dat random function for glsl
 float rand(vec2 co){ return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
@@ -22,23 +26,17 @@ float luminance ( vec3 color ) { return (color.r + color.g + color.b) / 3.0; }
 
 void main( void )
 {
-	vec2 uv = vTextureCoord;
+    vec2 uv = vTextureCoord;
 
-	vec2 p = uv - vec2(0.5);
-	float angle = atan(p.y, p.x);
-	float radius = length(p);
+    vec3 color = texture2D(uSampler, uv).rgb;
 
-	vec2 pp = vec2(angle, radius);
+    float lum = luminance(color);
 
-	pp = mod(abs(pp), 1.0);
+    uv.x = mix(uv.x, step(0.5, lum), uParameter2);
 
-	p = mix(p, pp, uParameter2);
+    uv += uParameter1 * 0.01 * vec2(rand(uv), rand(uv.yx));
 
-	// Broken Fish Eye
-	p *= mix(1.0, log(radius), abs(uParameter1));
-	p += 0.5;
-
-	vec3 color = texture2D( uSampler, p ).rgb;
+    color = texture2D(uSampler, uv).rgb;
     
     gl_FragColor = vec4( color, 1.0 );
 }

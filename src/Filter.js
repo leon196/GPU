@@ -17,14 +17,17 @@ Filter.Setup = function (res)
     Filter.PCFilter = new PCFilter(res.PCFilter.data);
     Filter.PCFilter2 = new PCFilter2(res.PCFilter2.data);
     Filter.PCFilter3 = new PCFilter3(res.PCFilter3.data);
+    Filter.LSDFilter = new LSDFilter(res.LSDFilter.data);
     Filter.TitleFilter = new TitleFilter(res.TitleFilter.data);
-	Filter.DistortionFilter = new DistortionFilter(res.DistortionFilter.data);
+    Filter.MenuFilter = new MenuFilter(res.MenuFilter.data);
+	Filter.LSDFilter2 = new LSDFilter2(res.LSDFilter2.data);
 	
 	Filter.filters = 
 		[ Filter.PCFilter2
 		, Filter.PCFilter
 		, Filter.TVFilter
-		, Filter.PCFilter3 ];
+		, Filter.PCFilter3
+		, Filter.LSDFilter ];
 
 	Filter.SetParameterCount();
 
@@ -42,8 +45,6 @@ Filter.Update = function ()
 	if (Filter.isReady)
 	{
 		var currentFilter = Filter.filters[Filter.currentFilterIndex];
-
-		Filter.TitleFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
 
 		currentFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
 		currentFilter.uniforms.uResolution.value = [Screen.size.width, Screen.size.height];

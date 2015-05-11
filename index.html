@@ -2,13 +2,16 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>GPU PANIC</title>
+        <title>GPU</title>
         <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" type="text/css" href="font/bebasneue-bold0.css">
     </head>
-    <body>
+    <body onload="onload()">
+        <div id="font">font</div>
         <div id="canvas"></div>
 
         <script src="src/lib/pixi.js"></script>
+        <script src="src/lib/howler.js"></script>
 
         <script src="src/utils/Color.js"></script>
         <script src="src/utils/ColorHex.js"></script>
@@ -23,8 +26,11 @@
         <script src="src/filters/PCFilter.js"></script>
         <script src="src/filters/PCFilter2.js"></script>
         <script src="src/filters/PCFilter3.js"></script>
+        <script src="src/filters/LSDFilter.js"></script>
+        <script src="src/filters/LSDFilter2.js"></script>
+
         <script src="src/filters/TitleFilter.js"></script>
-        <script src="src/filters/DistortionFilter.js"></script>
+        <script src="src/filters/MenuFilter.js"></script>
 
         <script src="src/Filter.js"></script>
         <script src="src/Asset.js"></script>

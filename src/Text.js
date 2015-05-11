@@ -35,8 +35,8 @@ Text.DrawText = function (textToDraw, ratio)
 
 	var scale = 16.0 + Math.floor(ratio * 256.0);
 
-	Text.bitmapText = new PIXI.extras.BitmapText(textToDraw, { font: scale + "px Nervous", tint: ColorHex.GetRainbow(1.0 - ratio)}); 
-	Text.bitmapTextWhite = new PIXI.extras.BitmapText(textToDraw, { font: scale + "px Nervous", tint: 0xffffff}); 
+	Text.bitmapText = new PIXI.extras.BitmapText(textToDraw, { font: scale + "px Bebas Neue Bold", tint: ColorHex.GetRainbow(1.0 - ratio)}); 
+	Text.bitmapTextWhite = new PIXI.extras.BitmapText(textToDraw, { font: scale + "px Bebas Neue Bold", tint: 0xffffff}); 
 
 	Text.bitmapText.x = Screen.size.width / 2 - Text.bitmapText.textWidth / 2;
 	Text.bitmapText.y = mix(Screen.size.height, Screen.size.height / 2 - Text.bitmapTextWhite.textHeight / 2, ratio);

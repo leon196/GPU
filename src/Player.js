@@ -51,7 +51,7 @@ Player.Rumble = function ()
 {
 	for (var p = 0; p < Player.parameterCount; ++p)
 	{
-		Player.parameterSeedList[p] = (Math.random() * 0.5 + 0.5) * Math.random() > 0.5 ? 1 : -1;
+		Player.parameterSeedList[p] = Math.random() > 0.5 ? 1 : -1;
 	}
 };
 

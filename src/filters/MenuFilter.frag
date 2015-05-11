@@ -45,7 +45,7 @@ void main (void)
 
       // Scanline
       float random1 = rand(pixelize(uv - vec2(0, uTimeElapsed * 0.01), pow(2.0, 10.0)).yy);
-      float random2 = rand(pixelize(uv + vec2(0, uTimeElapsed * 0.01), pow(2.0, 6.0)).yy) * 0.0125 * random1;
+      float random2 = rand(pixelize(uv + vec2(0, uTimeElapsed * 0.01), pow(2.0, 6.0)).yy) * 0.00125 * random1;
       uv += random2;
 
       // RGB 
