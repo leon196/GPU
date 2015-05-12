@@ -3,7 +3,6 @@ var Asset = {};
 Asset.LoadAndSetup = function (onComplete)
 {
     PIXI.loader
-    .add("img/background.jpg")
     .add("img/image.jpg")
     .add("font/bebas.fnt")
 
@@ -22,10 +21,7 @@ Asset.LoadAndSetup = function (onComplete)
     .add('LSDFilter2','src/filters/LSDFilter2.frag')
     .add('TitleFilter','src/filters/TitleFilter.frag')
     .add('MenuFilter','src/filters/MenuFilter.frag')
-    // .add(Asset.Table)
-    // .add("img/sprites.png", "img/sprites.json")
-    // .add("img/arms.png", "img/arms.json")
-    // .add("img/hands.png", "img/hands.json")
+    
     .once('complete', onComplete)
     .load();
 };

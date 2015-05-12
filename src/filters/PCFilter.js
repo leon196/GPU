@@ -12,9 +12,8 @@ function PCFilter(fragmentSource)
 
             , uParameter1 : {type: "1f", value: 0}
             , uParameter2 : {type: "1f", value: 0}
-            , uParameter3 : {type: "1f", value: 0}
 
-            , uParameterCount : {type: "1i", value: 3}
+            , uParameterCount : {type: "1i", value: 2}
         }
     );
 }

@@ -8,6 +8,9 @@ function MenuFilter(fragmentSource)
         // set the uniforms
         {
             uTimeElapsed : {type : '1f', value : 0}
+            
+            , uParameter1 : {type: "1f", value: 0}
+            , uParameter2 : {type: "1f", value: 0}
         }
     );
 }

@@ -1,3 +1,5 @@
+
+
 var Filter = {};
 
 Filter.isReady = false;
@@ -49,13 +51,13 @@ Filter.Update = function ()
 		currentFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
 		currentFilter.uniforms.uResolution.value = [Screen.size.width, Screen.size.height];
 
-		if (Filter.currentParameterCount > 0) currentFilter.uniforms.uParameter1.value = Player.parameterList[0];
-		if (Filter.currentParameterCount > 1) currentFilter.uniforms.uParameter2.value = Player.parameterList[1];
-		if (Filter.currentParameterCount > 2) currentFilter.uniforms.uParameter3.value = Player.parameterList[2];
-		if (Filter.currentParameterCount > 3) currentFilter.uniforms.uParameter4.value = Player.parameterList[3];
-		if (Filter.currentParameterCount > 4) currentFilter.uniforms.uParameter5.value = Player.parameterList[4];
-		if (Filter.currentParameterCount > 5) currentFilter.uniforms.uParameter6.value = Player.parameterList[5];
-		if (Filter.currentParameterCount > 6) currentFilter.uniforms.uParameter7.value = Player.parameterList[6];
-		if (Filter.currentParameterCount > 7) currentFilter.uniforms.uParameter8.value = Player.parameterList[7];
+		if (Filter.currentParameterCount > 0) currentFilter.uniforms.uParameter1.value = Control.GetParameter(1);
+		if (Filter.currentParameterCount > 1) currentFilter.uniforms.uParameter2.value = Control.GetParameter(2);
+		if (Filter.currentParameterCount > 2) currentFilter.uniforms.uParameter3.value = Control.GetParameter(3);
+		if (Filter.currentParameterCount > 3) currentFilter.uniforms.uParameter4.value = Control.GetParameter(4);
+		if (Filter.currentParameterCount > 4) currentFilter.uniforms.uParameter5.value = Control.GetParameter(5);
+		if (Filter.currentParameterCount > 5) currentFilter.uniforms.uParameter6.value = Control.GetParameter(6);
+		if (Filter.currentParameterCount > 6) currentFilter.uniforms.uParameter7.value = Control.GetParameter(7);
+		if (Filter.currentParameterCount > 7) currentFilter.uniforms.uParameter8.value = Control.GetParameter(8);
 	}
 };

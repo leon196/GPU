@@ -11,10 +11,6 @@ uniform float uTimeElapsed;
 
 uniform float uParameter1;
 uniform float uParameter2;
-uniform float uParameter3;
-uniform float uParameter4;
-uniform float uParameter5;
-uniform float uParameter6;
 
 // Dat random function for glsl
 float rand(vec2 co){ return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }

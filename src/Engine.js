@@ -13,42 +13,13 @@ Engine.isRestarting = false;
 Engine.Setup = function ()
 {
     // Pixi
-    Engine.renderer = new PIXI.WebGLRenderer(Screen.size.width, Screen.size.height,
-    {
-        resolution: 1.0
-    });
-    Engine.renderer.view.ondragover = function(e) {
-        e.preventDefault();
-        return false;
-    };
-    Engine.renderer.view.ondrop = function(e) {
-        e.preventDefault();
-        var file = e.dataTransfer.files[0],
-            reader = new FileReader();
-        reader.onload = function(event) {
-            var img = new Image(),
-                imgStr = event.target.result;
-            //state.innerHTML += ' Image Uploaded: <a href="' +
-                //imgStr + '" target="_blank">view image</a><br />';
-            img.src = event.target.result;
-            img.onload = function(event) {
-                Engine.scene.removeChild(Engine.scene.photo);
-                Engine.scene.photo = new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(this)));
-                Engine.scene.photo.width = Screen.size.width;
-                Engine.scene.photo.height = Screen.size.height;
-                Engine.scene.addChildAt(Engine.scene.photo, 1);
-                //state.innerHTML += ' Canvas Loaded: <a href="' + canvas.toDataURL() + '" target="_blank">view canvas</a><br />';
-            };
-        };
-        reader.readAsDataURL(file);
-        return false;
-    };
-
-    // Main Scene
-    Engine.scene = new Scene();
+    Engine.renderer = new PIXI.WebGLRenderer(Screen.size.width, Screen.size.height, {  resolution: 1.0 });
 
     // Render Texture
     Engine.renderTexture = new PIXI.RenderTexture(Engine.renderer, Screen.size.width, Screen.size.height); 
+
+    // Main Scene
+    Engine.scene = new Scene();
 
     // Mouse Events
     Engine.scene.touchmove = Engine.scene.mousemove = Input.MouseMove;
@@ -56,49 +27,12 @@ Engine.Setup = function ()
     Engine.scene.tap = Input.Tap;
     Engine.scene.mouseupoutside = Engine.scene.mouseout = Engine.scene.mouseup = Input.MouseUp;
 
-    Engine.introTitle = new Howl({
-        urls: ['sound/intro_titre.mp3']
-        , autoplay: false
-        , loop: true
-        , volume: 0.5
-    });
-
-    Engine.loopMyster = new Howl({
-        urls: ['sound/loop_mystere.mp3']
-        , autoplay: false
-        , loop: true
-        , volume: 0.5
-    });
-
-    Engine.introLoop = new Howl({
-        urls: ['sound/intro_loop.mp3']
-        , autoplay: false
-        , loop: false
-        , volume: 0.5
-        , onend: function() {
-            Engine.loopMyster.play();
-        }
-    });
-
-    Engine.sfxWin = new Howl({
-        urls: ['sound/sfx_win.mp3']
-        , autoplay: false
-        , loop: false
-        , volume: 0.25
-    });
-
-    Engine.introTitle.play();
+    // Drag and drop
+    Engine.renderer.view.ondragover = ondragover;
+    Engine.renderer.view.ondrop = ondrop;
 
     // Resize Event
-    window.addEventListener("resize", function ()
-    {
-        Screen.size.width = window.innerWidth;
-        Screen.size.height = window.innerHeight;
-
-        Engine.scene.Resize();
-
-        Engine.renderer.resize(Screen.size.width, Screen.size.height);
-    });
+    window.addEventListener("resize", Engine.Resize);
 
     // Load Asset
     Asset.LoadAndSetup(function(loader, res)
@@ -106,7 +40,7 @@ Engine.Setup = function ()
         // 
         Text.Setup();
 
-        Player.Init();
+        Control.Init();
 
         // Setup Filters
         Filter.Setup(res);
@@ -117,6 +51,9 @@ Engine.Setup = function ()
         // Add Canvas
         Engine.canvas = document.getElementById("canvas");
         Engine.canvas.appendChild(Engine.renderer.view);
+
+        // Sound
+        Sound.Menu();
 
         Engine.isReady = true;
     });
@@ -130,15 +67,20 @@ Engine.Update = function ()
     // Menu Title
     if (Engine.isPlaying == false && Filter.isReady)
     {
+        Control.Update();
+
         Filter.TitleFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
+        Filter.TitleFilter.uniforms.uParameter1.value = Control.GetParameter(1);
+        Filter.TitleFilter.uniforms.uParameter2.value = Control.GetParameter(2);
+        
         Filter.MenuFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
+        Filter.MenuFilter.uniforms.uParameter1.value = Control.GetParameter(1);
+        Filter.MenuFilter.uniforms.uParameter2.value = Control.GetParameter(2);
     }
 
     // Play
     if (Engine.isPlaying && Engine.isWinning == false)
     {
-        // Update
-        Player.Update();
         Filter.Update();
 
         // Introduction
@@ -146,27 +88,31 @@ Engine.Update = function ()
         {
             var ratioStart = animationRatio(Time.startingStarted, Time.startingDelay, Time.GetElapsed());
 
-            Player.Rumbling(ratioStart);
+            Control.Rumbling(ratioStart);
 
             if (ratioStart >= 1.0)
             {
                 Engine.isStarting = false;
             }
         }
-        // Check Win
-        else if (Player.DoesParameterDifferenceIsLessThan(0.05) && Engine.isWinning == false)
+        else
         {
-            Engine.Win();
+            Control.Update();
+
+            // Check Win
+            if (Control.DoesParameterDifferenceIsLessThan(0.05) && Engine.isWinning == false)
+            {
+                Engine.Win();
+            }
         }
     }
 
     // Start
-    else if (Engine.isReady && Input.anyKey && Engine.isPlaying == false)
+    else if (Engine.isReady && Engine.scene.menu.startButtonIsPressed && Engine.isPlaying == false)
     {
         Engine.isPlaying = true;
-        Engine.introTitle.stop();
-        Engine.introLoop.play();
         Engine.StartLevel();
+        Sound.Game();
     }
 
     // Win Animation
@@ -176,19 +122,26 @@ Engine.Update = function ()
 
         Text.DrawText(Text.GetBravo(), smoothstep(0.0, 0.5, ratioWin));
 
+        var currentFilter = Filter.filters[Filter.currentFilterIndex];
+        if (currentFilter.uniforms.uParameterFadeOut)
+        {
+            currentFilter.uniforms.uParameterFadeOut.value = 1.0 - ratioWin;
+        }
+
         if (ratioWin >= 1.0)
         {
             Engine.NextLevel();
         }
     }
 
+    // Hop
     Engine.renderer.render( Engine.scene );
 };
 
 Engine.StartLevel = function ()
 {
     Engine.scene.Start();
-    Player.Rumble();
+    Control.Rumble();
     Input.Rumble();
     Engine.isStarting = true;
     Time.startingStarted = Time.GetElapsed();
@@ -196,23 +149,22 @@ Engine.StartLevel = function ()
 
 Engine.NextLevel = function ()
 {
-    // Game Finished
     if (Filter.currentFilterIndex < Filter.filters.length - 1)
     {
         Engine.isWinning = false;
         Filter.currentFilterIndex++;
         Filter.SetParameterCount();
         Engine.scene.Start();
-        Player.Rumble();
+        Control.Rumble();
         Engine.isStarting = true;
         Time.startingStarted = Time.GetElapsed();
-        
     }
-    else
+    else // game finished
     {
         Engine.isWinning = true;
         Time.winningStarted = Time.GetElapsed();
     }
+
     Text.Clear();
     Text.NextBravo();
 };
@@ -228,9 +180,49 @@ Engine.Win = function ()
 {
     Time.winningStarted = Time.GetElapsed();
     Engine.isWinning = true;
-    Text.Clear();
-    Player.Clear();
-    Filter.Update();
+    Engine.Clear();
+    Sound.Win();
+};
 
-    Engine.sfxWin.play();
+Engine.Clear = function ()
+{
+    Text.Clear();
+    Control.Clear();
+    Filter.Update();
+};
+
+Engine.Resize = function ()
+{
+    Screen.size.width = window.innerWidth;
+    Screen.size.height = window.innerHeight;
+
+    Engine.scene.Resize();
+    Engine.renderer.resize(Screen.size.width, Screen.size.height);
+};
+
+// Drag and drop
+// Thanks to JKirchartz and robertc
+// http://stackoverflow.com/questions/7699987/html5-canvas-ondrop-event-isnt-firing
+function ondragover (e) 
+{
+    e.preventDefault();
+    return false;
+}
+
+function ondrop (e) 
+{
+    e.preventDefault();
+    var file = e.dataTransfer.files[0],
+    reader = new FileReader();
+    reader.onload = function(event) 
+    {
+        var img = new Image();
+        img.src = event.target.result;
+        img.onload = function(event) 
+        {
+            Engine.scene.UpdatePhoto(this);
+        };
+    };
+    reader.readAsDataURL(file);
+    return false;
 };

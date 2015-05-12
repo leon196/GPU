@@ -11,7 +11,7 @@ Text.Setup = function ()
 };
 
 Text.bravoCurrentIndex = 0;
-Text.bravoList = ["AWESOME!", "SHADERIFIC!", "GLITCHY!", "AYAYAYE!"];
+Text.bravoList = ["AWESOME!", "OH YEAH!", "SHADERIFIC!", "GLITCHY!", "AYAYAYE!"];
 Text.NextBravo = function ()
 {
 	Text.bravoCurrentIndex = (Text.bravoCurrentIndex + 1) % Text.bravoList.length;

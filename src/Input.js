@@ -70,7 +70,10 @@ Input.keyO = false;
 
 Input.keyCodes = [[70, 71], [82, 84], [86, 66], [88, 67], [89, 85], [72, 74], [75, 76], [73, 79]];
 
-Input.anyKey = false;
+Input.keyLeft = false;
+Input.keyUp = false;
+Input.keyRight = false;
+Input.keyDown = false;
 
 Input.Rumble = function ()
 {
@@ -104,8 +107,12 @@ Input.KeyDown = function (event)
 
         case Input.keyCodes[7][0]: Input.keyI = true; break;
         case Input.keyCodes[7][1]: Input.keyO = true; break;
+
+        case 37: Input.keyLeft = true; break;
+        case 38: Input.keyUp = true; break;
+        case 39: Input.keyRight = true; break;
+        case 40: Input.keyDown = true; break;
 	}
-    Input.anyKey = true;
 }
 
 Input.KeyUp = function (event)
@@ -135,8 +142,12 @@ Input.KeyUp = function (event)
 
         case Input.keyCodes[7][0]: Input.keyI = false; break;
         case Input.keyCodes[7][1]: Input.keyO = false; break;
+
+        case 37: Input.keyLeft = false; break;
+        case 38: Input.keyUp = false; break;
+        case 39: Input.keyRight = false; break;
+        case 40: Input.keyDown = false; break;
 	}
-    Input.anyKey = false;
 }
 
 // Keyboard Event

@@ -11,7 +11,6 @@ uniform float uTimeElapsed;
 
 uniform float uParameter1;
 uniform float uParameter2;
-uniform float uParameter3;
 
 // Dat random function for glsl
 float rand(vec2 co){ return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
@@ -25,11 +24,8 @@ void main( void )
 {
 	vec2 uv = vTextureCoord;
 
-    // Pixel Leek 1
-    uv = mix(uv, vec2(rand(uv.xx)), uParameter2 * step(0.95, rand(uv.xx))); 
-
     // Pixel Leek 2
-    uv = mix(uv, vec2(rand(uv.xx)), uParameter3 * step(0.5, rand(uv.yy))); 
+    uv = mix(uv, vec2(rand(uv.xx)), uParameter2 * step(0.5, rand(uv.yy))); 
 
 	// Pixel Local 
 	vec2 target = vec2(cos(uTimeElapsed) * 0.5 + 0.5, sin(uTimeElapsed) * 0.125 + 0.5);
@@ -40,7 +36,7 @@ void main( void )
     dist = dist * dist;
     float details = 4.0 + floor(dist * 12.0);
     details = pow(2.0, details);
-    uv = mix(uv, pixelize(uv, details), abs(uParameter1));
+    uv = mix(uv, pixelize(uv, details), uParameter1);
 
     vec3 color = texture2D(uSampler, uv).rgb;
     
