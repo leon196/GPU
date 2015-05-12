@@ -212,17 +212,23 @@ function ondragover (e)
 function ondrop (e) 
 {
     e.preventDefault();
-    var file = e.dataTransfer.files[0],
-    reader = new FileReader();
-    reader.onload = function(event) 
+
+    //
+    if (Engine.isPlaying)
     {
-        var img = new Image();
-        img.src = event.target.result;
-        img.onload = function(event) 
+        var file = e.dataTransfer.files[0],
+        reader = new FileReader();
+        reader.onload = function(event) 
         {
-            Engine.scene.UpdatePhoto(this);
+            var img = new Image();
+            img.src = event.target.result;
+            img.onload = function(event) 
+            {
+                //
+                Engine.scene.UpdatePhoto(this);
+            };
         };
-    };
-    reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+    }
     return false;
 };
