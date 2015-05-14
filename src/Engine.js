@@ -13,7 +13,12 @@ Engine.isRestarting = false;
 Engine.Setup = function ()
 {
     // Pixi
-    Engine.renderer = new PIXI.WebGLRenderer(Screen.size.width, Screen.size.height, {  resolution: 1.0 });
+    Engine.renderer = new PIXI.WebGLRenderer(Screen.size.width, Screen.size.height, {  
+        resolution: 1.0
+        // , transparent: true
+        , clearBeforeRender: false
+        , preserveDrawingBuffer: true
+    });
 
     // Render Texture
     Engine.renderTexture = new PIXI.RenderTexture(Engine.renderer, Screen.size.width, Screen.size.height); 
@@ -63,19 +68,12 @@ Engine.Update = function ()
 {
     // Update Scene
     Engine.scene.Update();
+    Control.Update();
 
     // Menu Title
-    if (Engine.isPlaying == false && Filter.isReady)
+    if (Engine.isPlaying == false)
     {
-        Control.Update();
-
-        Filter.TitleFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
-        Filter.TitleFilter.uniforms.uParameter1.value = Control.GetParameter(1);
-        Filter.TitleFilter.uniforms.uParameter2.value = Control.GetParameter(2);
-        
-        Filter.MenuFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
-        Filter.MenuFilter.uniforms.uParameter1.value = Control.GetParameter(1);
-        Filter.MenuFilter.uniforms.uParameter2.value = Control.GetParameter(2);
+        Engine.scene.menu.Update();
     }
 
     // Play
@@ -107,7 +105,7 @@ Engine.Update = function ()
         }
     }
 
-    // Start
+    // Menu
     else if (Engine.isReady && Engine.scene.menu.startButtonIsPressed && Engine.isPlaying == false)
     {
         Engine.isPlaying = true;

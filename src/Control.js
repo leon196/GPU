@@ -5,7 +5,7 @@ Control.parameterList = [];
 Control.parameterSeedList = [];
 // Control.parameterKeys = 
 
-Control.acceleration = 0.02;
+Control.acceleration = 0.01;
 
 Control.minimum = -1.0;
 Control.maximum = 1.0;
@@ -36,7 +36,15 @@ Control.GetParameter = function (number)
 
 Control.Update = function ()
 {
-	// KEYBOARD
+	// DEBUG
+
+	if (Filter.isReady)
+	{
+		if (Input.keyC) Filter.TestFilter.uniforms.uClear.value = 1.0;
+		else Filter.TestFilter.uniforms.uClear.value = 0.0;
+	}
+
+	// ARROWS
 
 	if (Input.keyLeft) Control.parameterList[0] = Control.Decrement(Control.parameterList[0]);
 	if (Input.keyRight) Control.parameterList[0] = Control.Increment(Control.parameterList[0]);

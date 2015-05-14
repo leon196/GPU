@@ -23,9 +23,12 @@ Filter.Setup = function (res)
     Filter.TitleFilter = new TitleFilter(res.TitleFilter.data);
     Filter.MenuFilter = new MenuFilter(res.MenuFilter.data);
 	Filter.LSDFilter2 = new LSDFilter2(res.LSDFilter2.data);
+
+	Filter.TestFilter = new TestFilter(res.TestFilter.data);
 	
 	Filter.filters = 
-		[ Filter.PCFilter2
+		[ Filter.TestFilter
+		, Filter.PCFilter2
 		, Filter.PCFilter
 		, Filter.TVFilter
 		, Filter.PCFilter3

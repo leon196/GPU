@@ -74,9 +74,23 @@ var Menu = function()
 
     this.Setup = function ()
     {
-	    this.titleContainer.filters = [Filter.TitleFilter];
-	    this.textContainer.filters = [Filter.MenuFilter];	
-        self.startContainer.filters = [Filter.MenuFilter];
+	    // this.titleContainer.filters = [Filter.TitleFilter];
+	    // this.textContainer.filters = [Filter.MenuFilter];	
+     //    self.startContainer.filters = [Filter.MenuFilter];
+    };
+
+    this.Update = function ()
+    {
+        if (Filter.isReady)
+        {
+            Filter.TitleFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
+            Filter.TitleFilter.uniforms.uParameter1.value = Control.GetParameter(1);
+            Filter.TitleFilter.uniforms.uParameter2.value = Control.GetParameter(2);
+            
+            Filter.MenuFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
+            Filter.MenuFilter.uniforms.uParameter1.value = Control.GetParameter(1);
+            Filter.MenuFilter.uniforms.uParameter2.value = Control.GetParameter(2);
+        }
     };
 
     this.Resize = function ()

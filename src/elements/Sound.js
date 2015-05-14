@@ -33,16 +33,16 @@ Sound.sfxWin = new Howl({
 
 Sound.Menu = function ()
 {
-    Sound.introTitle.play();
+    // Sound.introTitle.play();
 };
 
 Sound.Game = function ()
 {
     Sound.introTitle.stop();
-    Sound.introLoop.play();
+    // Sound.introLoop.play();
 };
 
 Sound.Win = function ()
 {
-    Sound.sfxWin.play();
+    // Sound.sfxWin.play();
 };

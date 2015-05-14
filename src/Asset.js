@@ -21,6 +21,7 @@ Asset.LoadAndSetup = function (onComplete)
     .add('LSDFilter2','src/filters/LSDFilter2.frag')
     .add('TitleFilter','src/filters/TitleFilter.frag')
     .add('MenuFilter','src/filters/MenuFilter.frag')
+    .add('TestFilter','src/filters/TestFilter.frag')
     
     .once('complete', onComplete)
     .load();
