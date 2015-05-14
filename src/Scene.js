@@ -4,9 +4,15 @@ var Scene = function()
     PIXI.Container.call(this);
     this.interactive = true;
 
+    // Background
+    this.background = new Graphics();
+    this.background.transparent = true;
+    this.background.Resize();
+    this.addChild(this.background);
+
     // Menu
     this.menu = new Menu();
-    // this.addChild(this.menu);
+    this.addChild(this.menu);
 
     // Photo
     this.photo = new PIXI.Sprite(PIXI.Texture.fromImage("img/image.jpg"));
@@ -15,6 +21,9 @@ var Scene = function()
     this.photo.visible = false;
     this.addChild(this.photo);
 
+    // this.sprite = new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(Engine.renderer.view.toDataURL())));
+    // Engine.renderTexture.render(this.menu);
+
     // Logic
     this.currentLevel = 0;
 
@@ -22,7 +31,9 @@ var Scene = function()
     {
         this.menu.Setup();
 
-        this.filters = [Filter.TestFilter];
+        // Filter.TestFilter.uniforms.uBackbuffer.value = Engine.renderTexture;
+        // this.menu.filters = [Filter.TestFilter];
+        // this.filters = [Filter.TestFilter];
     };
 
     this.Start = function ()
@@ -35,12 +46,13 @@ var Scene = function()
 
     this.Update = function ()
     {
-        if (Filter.isReady)
-        {
-            Filter.TestFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
-            Filter.TestFilter.uniforms.uResolution.value = [Screen.size.width, Screen.size.height];
-            Filter.TestFilter.uniforms.uParameter1.value = Control.GetParameter(1);
-        }
+        // if (Filter.isReady)
+        // {
+        //     Filter.TestFilter.uniforms.uTimeElapsed.value = Time.GetElapsed();
+        //     Filter.TestFilter.uniforms.uResolution.value = [Screen.size.width, Screen.size.height];
+        //     Filter.TestFilter.uniforms.uParameter1.value = Control.GetParameter(1);
+            // Engine.renderTexture.render(this.sprite);
+        // }
     };
 
     this.ShowMenu = function ()
@@ -61,6 +73,7 @@ var Scene = function()
 
     this.Resize = function ()
     {
+        this.background.Resize();
         this.menu.Resize();
 
         this.photo.width = Screen.size.width;

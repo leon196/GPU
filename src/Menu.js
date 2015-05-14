@@ -7,10 +7,6 @@ var Menu = function()
     // Logic
     this.startButtonIsPressed = false;
 
-    // Background
-    this.background = new Graphics();
-    this.addChild(this.background);
-
     // Containers
 
     this.titleContainer = new Graphics();
@@ -74,9 +70,9 @@ var Menu = function()
 
     this.Setup = function ()
     {
-	    // this.titleContainer.filters = [Filter.TitleFilter];
-	    // this.textContainer.filters = [Filter.MenuFilter];	
-     //    self.startContainer.filters = [Filter.MenuFilter];
+	    this.titleContainer.filters = [Filter.TitleFilter];
+	    this.textContainer.filters = [Filter.MenuFilter];	
+        self.startContainer.filters = [Filter.MenuFilter];
     };
 
     this.Update = function ()
@@ -95,7 +91,6 @@ var Menu = function()
 
     this.Resize = function ()
     {
-        this.background.Resize();
         this.titleContainer.Resize();
         this.startContainer.Resize();
 

@@ -16,8 +16,8 @@ Engine.Setup = function ()
     Engine.renderer = new PIXI.WebGLRenderer(Screen.size.width, Screen.size.height, {  
         resolution: 1.0
         // , transparent: true
-        , clearBeforeRender: false
-        , preserveDrawingBuffer: true
+        // , clearBeforeRender: false
+        // , preserveDrawingBuffer: true
     });
 
     // Render Texture

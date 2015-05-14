@@ -15,6 +15,8 @@ function TestFilter(fragmentSource)
             , uClear : {type: "1f", value: 0}
 
             , uParameterCount : {type: "1i", value: 2}
+
+            , uBackbuffer : {type: "sampler2D", value: 0}
         }
     );
 }

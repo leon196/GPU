@@ -6,6 +6,7 @@ precision mediump float;
 
 varying vec2 vTextureCoord;
 uniform sampler2D uSampler;
+uniform sampler2D uBackbuffer;
 uniform vec2 uResolution;
 uniform float uTimeElapsed;
 
@@ -33,7 +34,7 @@ void main( void )
     float radius = length(p);
 
     // Wow
-    vec2 force = vec2(cos(angle), sin(angle)) * (radius - (0.5 + 0.5 * sin(uTimeElapsed)));
+    // vec2 force = vec2(cos(angle), sin(angle)) * (radius - (0.5 + 0.5 * sin(uTimeElapsed)));
     // Scale In
     // vec2 force = vec2(cos(angle), sin(angle)) * (radius / (0.5 + 0.5 * sin(uTimeElapsed)));
     // Scale Out
@@ -41,16 +42,17 @@ void main( void )
     // Rotation
     // angle += uTimeElapsed;
     // vec2 force = vec2(cos(angle), sin(angle)) * radius;
+    vec3 col = texture2D(uBackbuffer, uv).rgb;
+    vec3 color = texture2D(uBackbuffer, uv + vec2(rand(col.xy)) * 0.1).rgb;
 
-    vec3 color = texture2D(uSampler, force + vec2(0.5)).rgb;
-
+if (radius < 0.01) color = vec3(0.5 + 0.5 * sin(uTimeElapsed), 0.5 + 0.5 * sin(uTimeElapsed), 0.5 + 0.5 * cos(uTimeElapsed));
     //color += texture2D(uSampler, uv).rgb;
 
     if (uClear == 0.0)
     {  
         if (getLuminance(color) < 0.333) 
         {
-            discard;
+            // discard;
         }
     }
     

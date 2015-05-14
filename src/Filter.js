@@ -27,8 +27,7 @@ Filter.Setup = function (res)
 	Filter.TestFilter = new TestFilter(res.TestFilter.data);
 	
 	Filter.filters = 
-		[ Filter.TestFilter
-		, Filter.PCFilter2
+		[ Filter.PCFilter2
 		, Filter.PCFilter
 		, Filter.TVFilter
 		, Filter.PCFilter3
