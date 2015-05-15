@@ -1,0 +1,34 @@
+{
+  "name": "GPU",
+  "version": "0.2.0",
+  "private": true,
+  "description": "GPU",
+  "scripts": {
+    "start": "wzrd src/js/main.js:gpu.min.js",
+    "prepublish": "browserify src/js/main.js | uglifyjs -cm > gpu.min.js"
+  },
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
+  },
+  "dependencies": {
+    "canvas-fit": "^1.2.0",
+    "gl-buffer": "^2.1.1",
+    "gl-clear": "^1.0.0",
+    "gl-context": "^0.1.1",
+    "gl-texture2d": "^2.0.8",
+    "gl-mat4": "^1.0.1",
+    "gl-fbo": "^2.0.3",
+    "glslify": "^1.6.0",
+    "right-now": "^1.0.0",
+    "ndarray" : "^1.0.16",
+    "ndarray-fill" : "^1.0.0",
+    "a-big-triangle" : "^1.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^8.0.3",
+    "uglify-js": "^2.4.16",
+    "wzrd": "^1.1.0"
+  }
+}

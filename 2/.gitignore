@@ -1,0 +1,5 @@
+video/
+videos/
+*.zip
+
+node_modules/
