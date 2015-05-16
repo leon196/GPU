@@ -44,6 +44,7 @@ void main()
 
    	// vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.004);// + 0.003 * t);
    	vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.002);
+	// force = pixelize(force, 512.0);
 
    	// angle = rand(p) * PI2;
    	//angle = rand(vec2(luminance(texture2D(uFramebuffer, uv).rgb), 0.0)) * PI2;
@@ -59,14 +60,16 @@ void main()
 	// vec4 color = texture2D(uFramebuffer, vTexCoord);//m + force);//(vec2(0.5) + force - m * 0.01);
 	// uv.y += offsetYAnimation;
 	vec4 picture = texture2D(uVideo, uv);
-	picture.rgb *= 0.5;
+
+	// picture.rgb *= 4.0;
 	// // if (length(p) < 0.01) 
-	float red = picture.r - picture.g - picture.b;
-	float blue = picture.b - picture.g - picture.r;
-	float green = picture.g - picture.r - picture.b;
-	float seuil = 0.0;
-	if (red > seuil || blue > seuil || green > seuil)
-	// if (luminance(picture.rgb) > 0.5)// + 0.5 * t)
+	// float red = picture.r - picture.g - picture.b;
+	// float blue = picture.b - picture.g - picture.r;
+	// float green = picture.g - picture.r - picture.b;
+	// float seuil = 0.0;
+	// if (red > seuil || blue > seuil || green > seuil)
+	// if (luminance(picture.rgb) > 0.25)// + 0.5 * t)
+	if (length(posterize(color.rgb, 4.0) - posterize(picture.rgb, 4.0)) > 0.5)
 	// if (picture.a > 0.0)
 	{
 		color = picture;//mix(color, picture, 0.05);
@@ -86,7 +89,9 @@ void main()
 	else
 	{
 		// float a = rand(color.rg + color.b) * PI2;
-		float a = rand(vec2(luminance(color.rgb), 0.0)) * PI2;
+		color = texture2D(uFramebuffer, pixelize(vTexCoord, 32.0));
+		float lum = luminance(color.rgb);
+		float a = rand(vec2(lum, 0.0)) * PI2;
 		vec2 d = vec2(cos(a), sin(a));
 		color = texture2D(uFramebuffer, vec2(0.5) + 0.004 * d + force);
 		// color.rgb *= 0.9;

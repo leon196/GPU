@@ -86,7 +86,7 @@ shell.on("gl-init", function ()
   videoElement.addEventListener("ended", videoDone, true)
   video.preload = "auto"
   video.loop = true
-  videoElement.src = "src/Christmas on VHS (Low).webm"
+  videoElement.src = "src/vh1.ogv"
 
   // console.log(shell)
 })
