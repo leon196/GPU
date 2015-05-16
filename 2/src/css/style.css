@@ -18,6 +18,11 @@ canvas
     margin: 0 auto;
 }
 
+video 
+{
+  display: none;
+}
+
 #loader
 {
     position: absolute;

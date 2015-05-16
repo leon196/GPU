@@ -17,8 +17,11 @@ var engine        = require('./engine')
 
 var buffer, shaderUpdate, shaderDraw
 var fboList, current = 0
-var texture, picture, uPicture
+var texture, picture, textureVideo, uPicture
 var textureReady = false
+var videoReady = false
+var videoElement = document.getElementById('video')
+var intervalID
 
 shell.on("gl-init", function ()
 {
@@ -46,27 +49,28 @@ shell.on("gl-init", function ()
   fboList = [ createFBO(gl, [width, height]), createFBO(gl, [width, height]) ]
 
   //Initialize fboList buffer
-  // var initial_conditions = ndarray(new Uint8Array(width*height*4), [width, height, 4])
-  // fill(initial_conditions, function(x,y,c) {
-  //   if(c === 3) {
-  //     return 255
-  //   }
+  var initial_conditions = ndarray(new Uint8Array(width*height*4), [width, height, 4])
+  fill(initial_conditions, function(x,y,c) {
+    if(c === 3) {
+      return 255
+    }
+    return 0
   //   return Math.random() > 0.9 ? 255 : 0
-  // })
-  // fboList[0].color[0].setPixels(initial_conditions)
+  })
+  fboList[0].color[0].setPixels(initial_conditions)
 
 
   //Set up vertex pointers
   shaderDraw.attributes.aPosition.location = shaderUpdate.attributes.aPosition.location = 0
 
   // http://learningwebgl.com/blog/?p=507
-  var picture = gl.createTexture();
+  var picture = gl.createTexture()
   picture.image = new Image()
   picture.image.onload = function() {
     texture = createTexture2d(gl, [picture.image.width, picture.image.height])
     texture.setPixels(picture.image)
 
-    fboList[0].color[0].setPixels(picture.image)
+    // fboList[0].color[0].setPixels(picture.image)
 
     shaderUpdate.bind()    
     uPicture = gl.getUniformLocation(shaderUpdate.handle, "uPicture")
@@ -77,8 +81,34 @@ shell.on("gl-init", function ()
   }
 
   picture.image.src = "src/img/image.png"
+
+  videoElement.addEventListener("canplaythrough", startVideo, true)
+  videoElement.addEventListener("ended", videoDone, true)
+  video.preload = "auto"
+  video.loop = true
+  videoElement.src = "src/Christmas on VHS (Low).webm"
+
   // console.log(shell)
 })
+
+function startVideo() 
+{
+  var gl = shell.gl
+  videoElement.play()
+  // console.log("hi")
+  shaderUpdate.bind()    
+  var uVideo = gl.getUniformLocation(shaderUpdate.handle, "uVideo")
+  gl.uniform1i(uVideo, 7)
+  textureVideo = createTexture2d(gl, [videoElement.videoWidth, videoElement.videoHeight])
+  textureVideo.setPixels(videoElement)
+  shaderUpdate.uniforms.uVideo = textureVideo.bind()
+  videoReady = true
+    // fboList[0].color[0].setPixels(videoElement)
+}
+function videoDone() {
+}
+
+
 
 shell.on("gl-error", function (e)
 {
@@ -99,6 +129,8 @@ shell.on("tick", function() {
   shaderUpdate.uniforms.uFramebuffer = prevState.color[0].bind()
   gl.activeTexture(gl.TEXTURE4)
   if (textureReady) shaderUpdate.uniforms.uPicture = texture.bind()
+  gl.activeTexture(gl.TEXTURE7)
+  if (videoReady) shaderUpdate.uniforms.uVideo = textureVideo.bind()
   shaderUpdate.uniforms.uResolution = [window.innerWidth, window.innerHeight]
   shaderUpdate.uniforms.uMouse = [shell.mouseX, shell.mouseY]
   shaderUpdate.uniforms.uTimeElapsed = now()
@@ -109,6 +141,8 @@ shell.on("tick", function() {
 shell.on("gl-render", function (t)
 {
   var gl = shell.gl
+
+  if (videoReady) textureVideo.setPixels(videoElement)
 
   //Render contents of buffer to screen
   shaderDraw.bind()

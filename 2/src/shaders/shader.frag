@@ -1,3 +1,6 @@
+
+// inspired by http://glslsandbox.com/e#25072.0
+
 precision mediump float;
 
 #define PI 3.141592653589
@@ -5,6 +8,7 @@ precision mediump float;
 
 uniform sampler2D uFramebuffer;
 uniform sampler2D uPicture;
+uniform sampler2D uVideo;
 uniform float uTimeElapsed;
 uniform vec2 uResolution;
 uniform vec2 uMouse;
@@ -19,6 +23,15 @@ void main()
 {
 	float offsetYAnimation = sin(uTimeElapsed * 0.001) * 0.25;
 
+
+	vec2 uv = vTexCoord;
+	uv.y = 1.0 - uv.y;
+
+	// vec2 m = uMouse / uResolution;
+	// m.y = 1.0 - m.y;
+	//m = (m - 0.5) * 2.0;
+
+
     vec2 p = vTexCoord - vec2(0.5);
 
     // p.y += offsetYAnimation;
@@ -27,34 +40,36 @@ void main()
     float angle = atan(p.y, p.x);
     float radius = length(p);
 
-    float t = sin(uTimeElapsed * 0.0005) * 0.5 + 0.5;
+    float t = sin(uTimeElapsed * 0.001) * 0.5 + 0.5;
 
-   	vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.004);// + 0.003 * t);
-   	// force = normalize(force);
+   	// vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.004);// + 0.003 * t);
+   	vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.002);
 
-   	angle = rand(p) * PI2;
-   	force += vec2(cos(angle), sin(angle)) * 0.002;
+   	// angle = rand(p) * PI2;
+   	//angle = rand(vec2(luminance(texture2D(uFramebuffer, uv).rgb), 0.0)) * PI2;
+   	// force += vec2(cos(angle), sin(angle)) * 0.001;
+
+   	vec4 color = texture2D(uFramebuffer, vTexCoord);
+
+   	// force += rand(colorBuffer.rg) * 0.001;
 
 
 	//color.rgb *= texture2D(uFramebuffer, vTexCoord + force * 0.01).rgb;
 
-	vec2 m = uMouse / uResolution;
-	m.y = 1.0 - m.y;
-	m = (m - 0.5) * 2.0;
-
-	vec4 color = texture2D(uFramebuffer, vec2(0.5) + force - m * 0.01);
-
-	vec2 uv = vTexCoord;
-	uv.y = 1.0 - uv.y;
+	// vec4 color = texture2D(uFramebuffer, vTexCoord);//m + force);//(vec2(0.5) + force - m * 0.01);
 	// uv.y += offsetYAnimation;
-	vec4 picture = texture2D(uPicture, uv);
-
-	// if (length(p) < 0.01) 
-	// if (luminance(picture.rgb) > 0.25 + 0.5 * t)
-
-	if (picture.a > 0.0)
+	vec4 picture = texture2D(uVideo, uv);
+	picture.rgb *= 0.5;
+	// // if (length(p) < 0.01) 
+	float red = picture.r - picture.g - picture.b;
+	float blue = picture.b - picture.g - picture.r;
+	float green = picture.g - picture.r - picture.b;
+	float seuil = 0.0;
+	if (red > seuil || blue > seuil || green > seuil)
+	// if (luminance(picture.rgb) > 0.5)// + 0.5 * t)
+	// if (picture.a > 0.0)
 	{
-		color = picture;
+		color = picture;//mix(color, picture, 0.05);
 		// if (rand(vTexCoord + vec2(uTimeElapsed * 0.5)) < 0.5)
 		// {
 		// 	color = vec4(
@@ -67,6 +82,14 @@ void main()
 		// {
 		// 	color = vec4(0.0, 0.0, 0.0, 1.0);
 		// }
+	}
+	else
+	{
+		// float a = rand(color.rg + color.b) * PI2;
+		float a = rand(vec2(luminance(color.rgb), 0.0)) * PI2;
+		vec2 d = vec2(cos(a), sin(a));
+		color = texture2D(uFramebuffer, vec2(0.5) + 0.004 * d + force);
+		// color.rgb *= 0.9;
 	}
 	// else if (rand(vTexCoord.xy + uTimeElapsed) < 0.01) color = vec4(rand(vTexCoord.xy + uTimeElapsed), cos(uTimeElapsed) * 0.5 + 0.5, sin(uTimeElapsed) * 0.5 + 0.5, 1.0);
 
