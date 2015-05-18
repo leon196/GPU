@@ -6,7 +6,7 @@ precision mediump float;
 #define PI 3.141592653589
 #define PI2 6.283185307179
 
-uniform sampler2D uFramebuffer;
+uniform sampler2D uBuffer;
 uniform sampler2D uPicture;
 uniform sampler2D uVideo;
 uniform float uTimeElapsed;
@@ -75,10 +75,10 @@ void main()
    	// vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.004);
    	// vec2 force = vec2(cos(angle), sin(angle)) * radius;
 
-   	vec4 color = texture2D(uFramebuffer, vTexCoord);
+   	vec4 color = texture2D(uBuffer, vTexCoord);
  
    	// vec2 force = forceFromNeighborhood(pixelize(uv, 4.0 + 4.0 * rand(color.rg + color.b)), uVideo);
-   	vec2 force = forceFromNeighborhood(vTexCoord, uFramebuffer);
+   	vec2 force = forceFromNeighborhood(vTexCoord, uBuffer);
    	// vec2 force = forceFromNeighborhood(pixelize(uv, 32.0), uVideo);
    	//vec2(0.0, rand(color.rg + color.b) + 0.5) * 0.008;
    	//-0.5 + rand(p.yy)
@@ -96,13 +96,13 @@ void main()
    	vec2 pp = vTexCoord - force * 0.01;
    	pp = mod(abs(pp), 1.0);
 
-   	color = texture2D(uFramebuffer, pp);
+   	color = texture2D(uBuffer, pp);
 
 
 
-	//color.rgb *= texture2D(uFramebuffer, vTexCoord + force * 0.01).rgb;
+	//color.rgb *= texture2D(uBuffer, vTexCoord + force * 0.01).rgb;
 
-	// vec4 color = texture2D(uFramebuffer, vTexCoord);//m + force);//(vec2(0.5) + force - m * 0.01);
+	// vec4 color = texture2D(uBuffer, vTexCoord);//m + force);//(vec2(0.5) + force - m * 0.01);
 	// uv.y += offsetYAnimation;
 	vec4 picture = texture2D(uVideo, uv);
 	// picture.rgb = posterize(picture.rgb, 8.0);
@@ -149,12 +149,12 @@ void main()
 	// {
 		// float a = rand(color.rg + color.b) * PI2;
 
-		// color = texture2D(uFramebuffer, vTexCoord);// pixelize(vTexCoord, 32.0));
+		// color = texture2D(uBuffer, vTexCoord);// pixelize(vTexCoord, 32.0));
 		// float lum = luminance(color.rgb);
 		// float a = rand(vec2(lum, 0.0)) * PI2 + uTimeElapsed * 0.001;
 		// a += rand(vTexCoord) * PI2;
 		// vec2 d = vec2(cos(a), sin(a));
-		// color = texture2D(uFramebuffer, vTexCoord);
+		// color = texture2D(uBuffer, vTexCoord);
 
 		// (rand(vTexCoord) * 0.001 + 0.001) 
 
