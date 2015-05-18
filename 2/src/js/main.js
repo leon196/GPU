@@ -16,12 +16,13 @@ var baboon        = require("baboon-image")
 var engine        = require('./engine')
 
 var buffer, shaderUpdate, shaderDraw
-var fboList, current = 0
+var fboList, fboWidth, fboHeight, current = 0
 var texture, picture, textureVideo, uPicture
 var textureReady = false
 var videoReady = false
 var videoElement = document.getElementById('video')
 var intervalID
+var initial_conditions
 
 shell.on("gl-init", function ()
 {
@@ -43,19 +44,18 @@ shell.on("gl-init", function ()
 
   //Allocate buffers
 
-  var width = 512
-  var height = 512
+  var fboWidth = 512
+  var fboHeight = 512
 
-  fboList = [ createFBO(gl, [width, height]), createFBO(gl, [width, height]) ]
+  fboList = [ createFBO(gl, [fboWidth, fboHeight]), createFBO(gl, [fboWidth, fboHeight]) ]
 
   //Initialize fboList buffer
-  var initial_conditions = ndarray(new Uint8Array(width*height*4), [width, height, 4])
+  initial_conditions = ndarray(new Uint8Array(fboWidth*fboHeight*4), [fboWidth, fboHeight, 4])
   fill(initial_conditions, function(x,y,c) {
-    if(c === 3) {
-      return 255
-    }
+    // Alpha
+    if(c === 3) return 255
+    // Color
     return 0
-  //   return Math.random() > 0.9 ? 255 : 0
   })
   fboList[0].color[0].setPixels(initial_conditions)
 
@@ -70,6 +70,9 @@ shell.on("gl-init", function ()
     texture = createTexture2d(gl, [picture.image.width, picture.image.height])
     texture.setPixels(picture.image)
 
+    // texture = createTexture2d(gl, [width, height])
+    // texture.setPixels(initial_conditions)
+
     // fboList[0].color[0].setPixels(picture.image)
 
     shaderUpdate.bind()    
@@ -77,18 +80,22 @@ shell.on("gl-init", function ()
     gl.uniform1i(uPicture, 4)
 
     shaderUpdate.uniforms.uPicture = texture.bind()
+    shaderUpdate.uniforms.uBufferResolution = [fboWidth, fboHeight]
     textureReady = true
   }
 
-  picture.image.src = "src/img/image.png"
+  picture.image.src = "src/img/image.jpg"
 
   videoElement.addEventListener("canplaythrough", startVideo, true)
   videoElement.addEventListener("ended", videoDone, true)
   video.preload = "auto"
   video.loop = true
-  videoElement.src = "src/vh1.ogv"
+  video.muted = true
+  videoElement.src = "../Depeche Mode - Enjoy The Silence (Low).mp4"
 
   // console.log(shell)
+
+  shell.bind("restart", "R")
 })
 
 function startVideo() 
@@ -101,6 +108,7 @@ function startVideo()
   gl.uniform1i(uVideo, 7)
   textureVideo = createTexture2d(gl, [videoElement.videoWidth, videoElement.videoHeight])
   textureVideo.setPixels(videoElement)
+  console.log(videoElement)
   shaderUpdate.uniforms.uVideo = textureVideo.bind()
   videoReady = true
     // fboList[0].color[0].setPixels(videoElement)
@@ -115,40 +123,53 @@ shell.on("gl-error", function (e)
   throw new Error("WebGL not supported :(")
 })
 
-shell.on("tick", function() {
-  var gl = shell.gl
-  var prevState = fboList[current]
-  var curState = fboList[current ^= 1]
+shell.on("tick", function() 
+{
+  if (textureReady && videoReady) 
+  {
+    var gl = shell.gl
+    var prevState = fboList[current]
+    var curState = fboList[current ^= 1]
 
-  //Switch to fboList fbo
-  curState.bind()
+    if(shell.wasDown("restart")) {
+      prevState.color[0].setPixels(initial_conditions)
+    }
 
-  //Run update shader
-  shaderUpdate.bind()    
-  gl.activeTexture(gl.TEXTURE0)
-  shaderUpdate.uniforms.uFramebuffer = prevState.color[0].bind()
-  gl.activeTexture(gl.TEXTURE4)
-  if (textureReady) shaderUpdate.uniforms.uPicture = texture.bind()
-  gl.activeTexture(gl.TEXTURE7)
-  if (videoReady) shaderUpdate.uniforms.uVideo = textureVideo.bind()
-  shaderUpdate.uniforms.uResolution = [window.innerWidth, window.innerHeight]
-  shaderUpdate.uniforms.uMouse = [shell.mouseX, shell.mouseY]
-  shaderUpdate.uniforms.uTimeElapsed = now()
-  fillScreen(gl)
+    //Switch to fboList fbo
+    curState.bind()
 
+    //Run update shader
+    shaderUpdate.bind()    
+    gl.activeTexture(gl.TEXTURE0)
+    shaderUpdate.uniforms.uFramebuffer = prevState.color[0].bind()
+    gl.activeTexture(gl.TEXTURE4)
+    if (textureReady) shaderUpdate.uniforms.uPicture = texture.bind()
+    gl.activeTexture(gl.TEXTURE7)
+    if (videoReady) shaderUpdate.uniforms.uVideo = textureVideo.bind()
+    shaderUpdate.uniforms.uResolution = [window.innerWidth, window.innerHeight]
+    shaderUpdate.uniforms.uMouse = [shell.mouseX, shell.mouseY]
+    shaderUpdate.uniforms.uTimeElapsed = now()
+    fillScreen(gl)
+  }
 })
 
 shell.on("gl-render", function (t)
 {
   var gl = shell.gl
+  if (textureReady && videoReady) 
+  {
+    textureVideo.setPixels(videoElement)
 
-  if (videoReady) textureVideo.setPixels(videoElement)
-
-  //Render contents of buffer to screen
-  shaderDraw.bind()
-  shaderDraw.uniforms.uBuffer = fboList[current].color[0].bind()
-  fillScreen(gl)
-
+    //Render contents of buffer to screen
+    shaderDraw.bind()
+    shaderDraw.uniforms.uBuffer = fboList[current].color[0].bind()
+    fillScreen(gl)
+  }
+  else
+  {
+    gl.clearColor(0, 0, 0, 0)
+    gl.clear(gl.COLOR_BUFFER_BIT)
+  }
 })
 
 /*

@@ -2,7 +2,7 @@
 {
     padding: 0;
     margin: 0;
-    color: #ff0000;
+    color: #000000;
     font-family: Flaticon;
 }
 
@@ -23,6 +23,23 @@ video
   display: none;
 }
 
+a:link 
+{ 
+    color: #ffffff; 
+}
+a:visited 
+{ 
+    color: #ffffff; 
+}
+a:hover 
+{ 
+    color: #ffffff; 
+}
+a:active 
+{ 
+    color: #ffffff; 
+}
+
 #loader
 {
     position: absolute;
@@ -37,4 +54,14 @@ video
 {
     font-family: Flaticon;
     visibility: hidden;
+}
+
+#info
+{
+    color: #ffffff;
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 1;
+    text-shadow: 0px 0px 2px #000000
 }
