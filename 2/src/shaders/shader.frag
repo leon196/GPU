@@ -20,17 +20,30 @@ float luminance ( vec3 color ) { return (color.r + color.g + color.b) / 3.0; }
 vec2 pixelize(vec2 uv, float details) { return floor(uv.xy * details) / details; }
 vec3 posterize ( vec3 color, float details ) { return floor(color * details) / details; }
 
-vec2 neighborhood (vec2 p, sampler2D map) 
+vec2 forceFromNeighborhood (vec2 p, sampler2D map) 
 { 
 	float s = 1.0 / uBufferResolution.x;
 	vec2 n = vec2(0.0);
+	float l = luminance(texture2D(map, p).rgb);
 
-	n.x += luminance(texture2D(map, p - vec2(s, 0.0)).rgb) - luminance(texture2D(map, p + vec2(s, 0.0)).rgb);
-	n.y += luminance(texture2D(map, p - vec2(0.0, s)).rgb) - luminance(texture2D(map, p + vec2(0.0, s)).rgb);
+	n.x += luminance(texture2D(map, p - vec2(s, 0.0)).rgb) - l;
+	n.x += l - luminance(texture2D(map, p + vec2(s, 0.0)).rgb);
+	n.y += luminance(texture2D(map, p - vec2(0.0, s)).rgb) - l;
+	n.y += l - luminance(texture2D(map, p + vec2(0.0, s)).rgb);
 
-	// n += luminance(texture2D(map, p + vec2(s, s)).rgb) - luminance(texture2D(map, p - vec2(s, s)).rgb);
-	// n += luminance(texture2D(map, p + vec2(s, -s)).rgb) - luminance(texture2D(map, p - vec2(s, -s)).rgb);
-	// n += luminance(texture2D(map, p + vec2(-s, -s)).rgb) - luminance(texture2D(map, p - vec2(-s, -s)).rgb);
+	return n;
+}
+
+vec2 numberOfNeighbord (vec2 p, sampler2D map) 
+{ 
+	float s = 1.0 / uBufferResolution.x;
+	vec2 n = vec2(0.0);
+	float l = luminance(texture2D(map, p).rgb);
+
+	n.x += luminance(texture2D(map, p - vec2(s, 0.0)).rgb) - l;
+	n.x += l - luminance(texture2D(map, p + vec2(s, 0.0)).rgb);
+	n.y += luminance(texture2D(map, p - vec2(0.0, s)).rgb) - l;
+	n.y += l - luminance(texture2D(map, p + vec2(0.0, s)).rgb);
 
 	return n;
 }
@@ -47,7 +60,7 @@ void main()
 	m.y = 1.0 - m.y;
 	// m = (m - 0.5) * 2.0;
 
-    vec2 p = vTexCoord - vec2(0.5);
+    vec2 p = (vTexCoord - vec2(0.5));
 
     // p.y += offsetYAnimation;
     // p *= uResolution;
@@ -55,32 +68,36 @@ void main()
     float angle = atan(p.y, p.x);
     float radius = length(p);
 
-    // float t = sin(uTimeElapsed * 0.001) * 0.5 + 0.5;
+    float t = sin(uTimeElapsed * 0.001) * 0.5 + 0.5;
 
    	// vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.004 + 0.003 * t);
-   	// vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.002);
+   	// vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.004);
    	// vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.004);
    	// vec2 force = vec2(cos(angle), sin(angle)) * radius;
 
    	vec4 color = texture2D(uFramebuffer, vTexCoord);
  
-   	vec2 force = normalize(neighborhood(pixelize(uv, 32.0), uVideo));
+   	// vec2 force = forceFromNeighborhood(pixelize(uv, 4.0 + 4.0 * rand(color.rg + color.b)), uVideo);
+   	vec2 force = forceFromNeighborhood(vTexCoord, uFramebuffer);
+   	// vec2 force = forceFromNeighborhood(pixelize(uv, 32.0), uVideo);
    	//vec2(0.0, rand(color.rg + color.b) + 0.5) * 0.008;
    	//-0.5 + rand(p.yy)
-
-   	vec2 pp = vTexCoord + force * 0.002;
-   	pp = mod(abs(pp), 1.0);
-
-   	color = texture2D(uFramebuffer, pp);
+   	// force += rand(color.rg) * 0.25;
 
 	// force = pixelize(force, 512.0);
 
    	// angle = mix(rand(p + vec2(uTimeElapsed * 0.001, 0.0)) * PI2, rand(p) * PI2, clamp(m.y + 0.5, 0.0, 1.0));
-   	//angle = rand(vec2(luminance(texture2D(uFramebuffer, uv).rgb), 0.0)) * PI2;
+   	// angle = rand(color.rg + color.b) * PI2;
    	// force += vec2(cos(angle), sin(angle)) * 0.001;
+   	// vec2 force = vec2(cos(angle), sin(angle));
 
 
-   	// force += rand(colorBuffer.rg) * 0.001;
+   	// vec2 pp = vTexCoord + force * 0.01;
+   	vec2 pp = vTexCoord - force * 0.01;
+   	pp = mod(abs(pp), 1.0);
+
+   	color = texture2D(uFramebuffer, pp);
+
 
 
 	//color.rgb *= texture2D(uFramebuffer, vTexCoord + force * 0.01).rgb;

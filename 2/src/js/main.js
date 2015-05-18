@@ -91,7 +91,9 @@ shell.on("gl-init", function ()
   video.preload = "auto"
   video.loop = true
   video.muted = true
-  videoElement.src = "../Depeche Mode - Enjoy The Silence (Low).mp4"
+  videoElement.src = 'src/video/vh1.ogv'
+  // videoElement.src = "src/video/Depeche Mode - Enjoy The Silence (Low).mp4"
+  // videoElement.src = "src/video/Blip Standard Player - Found Footage Festival Pet Rock.mp4"
 
   // console.log(shell)
 
@@ -100,20 +102,27 @@ shell.on("gl-init", function ()
 
 function startVideo() 
 {
-  var gl = shell.gl
-  videoElement.play()
-  // console.log("hi")
-  shaderUpdate.bind()    
-  var uVideo = gl.getUniformLocation(shaderUpdate.handle, "uVideo")
-  gl.uniform1i(uVideo, 7)
-  textureVideo = createTexture2d(gl, [videoElement.videoWidth, videoElement.videoHeight])
-  textureVideo.setPixels(videoElement)
-  console.log(videoElement)
-  shaderUpdate.uniforms.uVideo = textureVideo.bind()
-  videoReady = true
+  if (videoReady == false)
+  {
+    videoReady = true
+
+    var gl = shell.gl
+    videoElement.currentTime = Math.random() * videoElement.duration
+    videoElement.play()
+
+    shaderUpdate.bind()    
+    var uVideo = gl.getUniformLocation(shaderUpdate.handle, "uVideo")
+    gl.uniform1i(uVideo, 7)
+    textureVideo = createTexture2d(gl, [videoElement.videoWidth, videoElement.videoHeight])
+    textureVideo.setPixels(videoElement)
+    console.log(videoElement)
+    shaderUpdate.uniforms.uVideo = textureVideo.bind()
     // fboList[0].color[0].setPixels(videoElement)
+  }
 }
-function videoDone() {
+
+function videoDone() 
+{
 }
 
 
