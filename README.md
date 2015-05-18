@@ -12,9 +12,10 @@
 
 # Videos
 
-### https://vimeo.com/album/3397195
+### Playing : https://vimeo.com/127556214
+### Research : https://vimeo.com/album/3397195
 
-# Research and development
+# Prototypes
 
 ### http://poly.gonum.free.fr/GlitchTV/1
 ### http://poly.gonum.free.fr/GlitchTV/2
