@@ -6,16 +6,20 @@
 var videoList = 
 [ 
   { 
-    title: "VH1"
+    title: "VH1 Classic"
     , url: "src/video/vh1.ogv" 
   }
   , { 
-    title: "Dance"
-    , url: "src/video/Dance from ozlem kahraman from vimeo.mp4" 
+    title: "Depeche Mode"
+    , url: "src/video/Depeche Mode - Enjoy The Silence (Low).mp4" 
   }
   , { 
-    title: "Vince"
+    title: "Vince Mcmahons"
     , url: "src/video/vince.ogv" 
+  }
+  , { 
+    title: "Dance Ozlem Kahraman"
+    , url: "src/video/Dance from ozlem kahraman from vimeo.mp4" 
   }
 ]
 
