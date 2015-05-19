@@ -1,8 +1,9 @@
 
 var canvas          = document.body.appendChild(document.createElement('canvas'))
 var shell	          = require('gl-now')()
-var now             = require('right-now')
 var createFBO       = require('gl-fbo')
+var glslify         = require('glslify')
+var now             = require('right-now')
 var fillScreen      = require('a-big-triangle')
 var shader          = require('./shader')
 var data            = require('./data')
@@ -32,12 +33,6 @@ shell.on('gl-init', function ()
 {
   var gl = shell.gl
 
-  // Menu Video
-  menu.videoListElement.addEventListener('change', function()
-  {
-    video = new data.Video( gl, document.getElementById('video'), menu.GetVideoURL() )
-  })
-
   // Picture
   picture = new data.Picture( gl, 'src/img/image.jpg' )
 
@@ -45,7 +40,8 @@ shell.on('gl-init', function ()
   video = new data.Video( gl, document.getElementById('video'), menu.GetVideoURL() )
 
   // Glitch
-  glitchShader = new shader.Glitch(gl, '1')
+  glitchShader = new shader.Glitch(gl, glslify(__dirname + '/../shaders/gallery/LiquidPainting.frag'))
+  menu.shaderInfoElement.innerHTML = menu.GetShaderInfo()
 
   // Draw Shader
   simpleShader = new shader.Simple(gl)
@@ -58,6 +54,27 @@ shell.on('gl-init', function ()
 
   // Keyboard
   shell.bind('restart', 'R')
+
+  // Menu Video
+  menu.videoListElement.addEventListener('change', function()
+  {
+    video = new data.Video( gl, document.getElementById('video'), menu.GetVideoURL() )
+  })
+
+  // Menu Shader
+  menu.shaderListElement.addEventListener('change', function()
+  {
+    switch (menu.GetShaderSelected())
+    {
+      case 0: 
+        glitchShader.rebuild(glslify(__dirname + '/../shaders/gallery/LiquidPainting.frag')) 
+        break
+      case 1: 
+        glitchShader.rebuild(glslify(__dirname + '/../shaders/gallery/FakeDataMoshing.frag')) 
+        break
+    }
+    menu.shaderInfoElement.innerHTML = menu.GetShaderInfo()
+  })
 
   gl.disable(gl.DEPTH_TEST)
 })
@@ -79,6 +96,7 @@ shell.on('tick', function()
     glitchShader.bind()   
 
     glitchShader.update( now(), shell.mouseX, shell.mouseY )
+    glitchShader.updateTreshold( menu.autoTresholdCheckbox.checked, menu.videoTresholdSlider.value / 100 )
 
     glitchShader.updateBuffer( previousFbo.color[0].bind() )
     glitchShader.updatePicture( picture.texture.bind() )

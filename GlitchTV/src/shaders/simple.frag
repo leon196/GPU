@@ -1,7 +1,6 @@
 precision mediump float;
 
 uniform sampler2D uBuffer;
-uniform vec2 uResolution;
 varying vec2 vTexCoord;
 
 void main() 

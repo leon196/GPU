@@ -15,11 +15,6 @@
 ### Playing : https://vimeo.com/127556214
 ### Research : https://vimeo.com/album/3397195
 
-# Prototypes
+# Current prototype
 
-### http://poly.gonum.free.fr/GlitchTV/1
-### http://poly.gonum.free.fr/GlitchTV/2
-### http://poly.gonum.free.fr/GlitchTV/3
-### http://poly.gonum.free.fr/GlitchTV/4
-### http://poly.gonum.free.fr/GlitchTV/5
-### http://poly.gonum.free.fr/GlitchTV/6
+### http://poly.gonum.free.fr/GlitchTV/

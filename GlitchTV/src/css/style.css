@@ -23,8 +23,15 @@ video
 
 select
 {
-    margin-left: 8px;
-    margin-right: 32px;
+    text-align: center;
+    position: relative;
+    right: 0;
+    width: 100%;
+}
+
+option
+{
+    padding: 4px;
 }
 
 a:link 
@@ -74,16 +81,29 @@ a:active
     left: 16px;
     top: 16px;
     z-index: 1;
+    font-size: 20px;
+    visibility: hidden;
 }
 
 #menuVideo
 {
-    display: inline-block;
 }
 
 #menuShader
+, #titleShader
+, #infoSlider
+, #infoShader
 {
-    display: inline-block;
+    margin-top: 8px;
+}
+
+#sliderTreshold
+{
+    width: 100%;
+}
+
+#autoTreshold
+{
 }
 
 .text

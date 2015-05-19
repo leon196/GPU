@@ -1,80 +1,95 @@
 
-var glslify  	= require('glslify')
-var settings 	= require('./settings')
+var createShader 	= require('gl-shader')
+var glslify  		= require('glslify')
+var settings 		= require('./settings')
 
-exports.Glitch = function ( gl, fileName )
+exports.Glitch = function ( gl, fragmentSource )
 {
 	this.gl = gl
 
 	// Shader Program
-	this.program = glslify({
-	    frag: '../shaders/gallery/1.frag',
-	    vert: '../shaders/simple.vert'
-	})(gl)
+	this.shader = createShader(gl
+		, glslify(__dirname + '/../shaders/simple.vert')
+		, fragmentSource)
 
-	// Attribute index for vertex position
-	this.program.attributes.aPosition.location = 0
+	this.setup = function ()
+	{
+		// Attribute
+		this.shader.attributes.aPosition.location = 0
 
-	this.program.bind()
+		this.shader.bind()
 
-	// Uniform index for buffer
-	gl.uniform1i( gl.getUniformLocation( this.program.handle, "uBuffer" ), 0 )
+		// Uniform index for buffer
+		gl.uniform1i( gl.getUniformLocation( this.shader.program, "uBuffer" ), 0 )
 
-	// Uniform index for picture
-	gl.uniform1i( gl.getUniformLocation( this.program.handle, "uPicture" ), 4 )
+		// Uniform index for picture
+		gl.uniform1i( gl.getUniformLocation( this.shader.program, "uPicture" ), 4 )
 
-	// Uniform index for video
-	gl.uniform1i( gl.getUniformLocation( this.program.handle, "uVideo" ) , 7 )
+		// Uniform index for video
+		gl.uniform1i( gl.getUniformLocation( this.shader.program, "uVideo" ) , 7 )
 
-	// Resolution
-	this.program.bind()  
-	this.program.uniforms.uResolution = [ settings.screen.width , settings.screen.height ]
-	this.program.uniforms.uBufferResolution = [ settings.fbo.width , settings.fbo.height ]
+		// Resolution
+		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "uBufferResolution" ), new Float32Array([ settings.fbo.width , settings.fbo.height ]))
+		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "uResolution" ), new Float32Array([ settings.screen.width , settings.screen.height ]))
+	}
 
 	this.bind = function ()
 	{
-		this.program.bind()
+		this.shader.bind()
+	}
+
+	this.rebuild = function ( fragmentSource )
+	{
+		this.shader.update(glslify(__dirname + '/../shaders/simple.vert'), fragmentSource)
+		this.setup()
 	}
 
 	this.update = function ( timeElapsed, mouseX, mouseY )
 	{
-	    this.program.uniforms.uMouse = [mouseX, mouseY]
-	    this.program.uniforms.uTimeElapsed = timeElapsed
+	    this.shader.uniforms.uMouse = [mouseX, mouseY]
+	    this.shader.uniforms.uTimeElapsed = timeElapsed
 	}
+
+    this.updateTreshold = function ( isAuto, sliderRatio )
+    {
+    	this.shader.uniforms.uAutoTreshold = isAuto ? 1 : 0
+    	this.shader.uniforms.uSliderRatio = sliderRatio
+    }
 
 	this.updateBuffer = function ( sampler2D )
 	{
 	    this.gl.activeTexture(this.gl.TEXTURE0)
-	    this.program.uniforms.uBuffer = sampler2D
+	    this.shader.uniforms.uBuffer = sampler2D
 	}
 
 	this.updatePicture = function ( sampler2D )
 	{
 	    this.gl.activeTexture(this.gl.TEXTURE4)
-	    this.program.uniforms.uPicture = sampler2D
+	    this.shader.uniforms.uPicture = sampler2D
 	}
 
 	this.updateVideo = function ( sampler2D )
 	{
 	    this.gl.activeTexture(this.gl.TEXTURE7)
-	    this.program.uniforms.uVideo = sampler2D
+	    this.shader.uniforms.uVideo = sampler2D
 	}
 
   	this.resize = function ()
   	{
-	    this.program.bind()  
-	    this.program.uniforms.uResolution = [ settings.screen.width , settings.screen.height ]
+	    this.shader.bind()  
+	    this.shader.uniforms.uResolution = [ settings.screen.width , settings.screen.height ]
   	}
+
+	this.setup()
 
   	return this
 }
 
 exports.Simple = function ( gl )
 {
-	this.glslify = glslify({
-	    frag: '../shaders/simple.frag',
-	    vert: '../shaders/simple.vert'
-	})(gl)
+	this.glslify = createShader(gl
+		, glslify(__dirname + '/../shaders/simple.vert')
+		, glslify(__dirname + '/../shaders/simple.frag'))
 
 	this.bind = function ()
 	{

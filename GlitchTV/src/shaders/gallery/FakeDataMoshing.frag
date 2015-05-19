@@ -9,11 +9,15 @@ precision mediump float;
 uniform sampler2D uBuffer;
 uniform sampler2D uPicture;
 uniform sampler2D uVideo;
-uniform float uTimeElapsed;
+
 uniform vec2 uBufferResolution;
 uniform vec2 uResolution;
 uniform vec2 uMouse;
 varying vec2 vTexCoord;
+
+uniform float uTimeElapsed;
+uniform float uAutoTreshold;
+uniform float uSliderRatio;
 
 float rand(vec2 co){ return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
 float luminance ( vec3 color ) { return (color.r + color.g + color.b) / 3.0; }
@@ -61,13 +65,12 @@ void main()
 
    	// Video color
 	vec4 video = texture2D(uVideo, uv);
+	
+	float treshold = mix(uSliderRatio, 0.3 + 0.2 * t, uAutoTreshold);
 
 	// Reinject video if colors are too much different
-	if (distance(color.rgb, video.rgb) > 0.3 + 0.2 * t)
-	{
-		color = video;
-	}
+	color = mix(color, video, step(treshold, distance(color.rgb, video.rgb)));
 
-	// Et voila
+	// Hop
 	gl_FragColor = color;
 }
