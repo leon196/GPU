@@ -1,12 +1,13 @@
 
 var canvas          = document.body.appendChild(document.createElement('canvas'))
-var shell	          = require("gl-now")()
+var shell	          = require('gl-now')()
 var now             = require('right-now')
-var createFBO       = require("gl-fbo")
-var fillScreen      = require("a-big-triangle")
+var createFBO       = require('gl-fbo')
+var fillScreen      = require('a-big-triangle')
 var shader          = require('./shader')
 var data            = require('./data')
 var color           = require('./color')
+var menu            = require('./menu')
 var settings        = require('./settings')
 
 window.addEventListener('resize', function (e)
@@ -24,20 +25,27 @@ window.addEventListener('resize', function (e)
 var glitchShader, simpleShader
 var fboList, current = 0
 var picture, video
-var black
 
-shell.on("gl-init", function ()
+var menuElement
+
+shell.on('gl-init', function ()
 {
   var gl = shell.gl
 
+  // Menu Video
+  menu.videoListElement.addEventListener('change', function()
+  {
+    video = new data.Video( gl, document.getElementById('video'), menu.GetVideoURL() )
+  })
+
   // Picture
-  picture = new data.Picture( gl, "src/img/image.jpg" )
+  picture = new data.Picture( gl, 'src/img/image.jpg' )
 
   // Video
-  video = new data.Video( gl, document.getElementById('video'), 'src/video/vh1.ogv' )
+  video = new data.Video( gl, document.getElementById('video'), menu.GetVideoURL() )
 
   // Glitch
-  glitchShader = new shader.Glitch(gl)
+  glitchShader = new shader.Glitch(gl, '1')
 
   // Draw Shader
   simpleShader = new shader.Simple(gl)
@@ -49,12 +57,12 @@ shell.on("gl-init", function ()
   fboList[0].color[0].setPixels( color.Black )
 
   // Keyboard
-  shell.bind("restart", "R")
+  shell.bind('restart', 'R')
 
   gl.disable(gl.DEPTH_TEST)
 })
 
-shell.on("tick", function() 
+shell.on('tick', function() 
 {
   if (picture.isReady && video.isReady) 
   {
@@ -62,7 +70,7 @@ shell.on("tick", function()
     var previousFbo = fboList[current]
     var currentFbo = fboList[current ^= 1]
 
-    if(shell.wasDown("restart")) 
+    if(shell.wasDown('restart')) 
     {
       previousFbo.color[0].setPixels( color.Black )
     }
@@ -80,7 +88,7 @@ shell.on("tick", function()
   }
 })
 
-shell.on("gl-render", function (t)
+shell.on('gl-render', function (t)
 {
   var gl = shell.gl
 
@@ -101,9 +109,9 @@ shell.on("gl-render", function (t)
   }
 })
 
-shell.on("gl-error", function (e)
+shell.on('gl-error', function (e)
 {
-  throw new Error("WebGL not supported :(")
+  throw new Error('WebGL not supported :(')
 })
 
 

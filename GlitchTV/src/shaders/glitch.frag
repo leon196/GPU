@@ -3,8 +3,10 @@
 
 precision mediump float;
 
-#define PI 3.141592653589
-#define PI2 6.283185307179
+#define PI 3.141592653
+#define PI2 6.283185307
+#define RADTier 2.094395102
+#define RAD2Tier 4.188790205
 
 uniform sampler2D uBuffer;
 uniform sampler2D uPicture;
@@ -77,9 +79,9 @@ void main()
 
    	vec4 color = texture2D(uBuffer, vTexCoord);
  
-   	// vec2 force = forceFromNeighborhood(pixelize(uv, 4.0 + 4.0 * rand(color.rg + color.b)), uVideo);
-   	vec2 force = forceFromNeighborhood(vTexCoord, uBuffer);
-   	// vec2 force = forceFromNeighborhood(pixelize(uv, 32.0), uVideo);
+   	// vec2 force = forceFromNeighborhood(pixelize(uv, 4.0 + 4.0 * rand(vec2(luminance(color.rgb), 0.0))), uVideo);
+   	// vec2 force = forceFromNeighborhood(vTexCoord, uBuffer);
+   	vec2 force = forceFromNeighborhood(pixelize(uv, 32.0), uVideo);
    	//vec2(0.0, rand(color.rg + color.b) + 0.5) * 0.008;
    	//-0.5 + rand(p.yy)
    	// force += rand(color.rg) * 0.25;
@@ -92,13 +94,17 @@ void main()
    	// vec2 force = vec2(cos(angle), sin(angle));
 
 
-   	// vec2 pp = vTexCoord + force * 0.01;
-   	vec2 pp = vTexCoord - force * 0.01;
+   	vec2 pp = vTexCoord - normalize(force) * 0.002;
+   	// vec2 pp = vTexCoord - force * 0.01;
    	pp = mod(abs(pp), 1.0);
 
-   	color = texture2D(uBuffer, pp);
+   	// color = texture2D(uBuffer, pp);
 
-
+   	angle = rand(p) * PI2;
+   	float size = luminance(color.rgb) * 0.001;
+   	color.r = texture2D(uBuffer, pp + vec2(cos(angle), sin(angle)) * size).r;
+   	color.g = texture2D(uBuffer, pp + vec2(cos(angle + RADTier), sin(angle + RADTier)) * size).g;
+   	color.b = texture2D(uBuffer, pp + vec2(cos(angle + RAD2Tier), sin(angle + RAD2Tier)) * size).b;
 
 	//color.rgb *= texture2D(uBuffer, vTexCoord + force * 0.01).rgb;
 
@@ -124,13 +130,20 @@ void main()
 	// float blue = abs(picture.b - color.b);
 	// float seuil = 1.0 - m.x;
 	// if (red > seuil || blue > seuil || green > seuil)
-	if (distance(color.rgb, picture.rgb) > 0.5)
+	if (distance(color.rgb, picture.rgb) > 0.3 + 0.2 * t)
 	// if ()
 	// if (luminance(picture.rgb) > m.x)
 	// if (picture.a > 0.0)
 	// if (red + blue + green > m.x)
 	{
 		color = picture;
+
+	   	// angle = rand(p) * PI2;
+	   	// float size = luminance(picture.rgb) * 0.01;
+	   	// color.r = texture2D(uVideo, uv + vec2(cos(angle), sin(angle)) * size).r;
+	   	// color.g = texture2D(uVideo, uv + vec2(cos(angle + RADTier), sin(angle + RADTier)) * size).g;
+	   	// color.b = texture2D(uVideo, uv + vec2(cos(angle + RAD2Tier), sin(angle + RAD2Tier)) * size).b;
+
 		//color = mix(color, picture, 0.05);
 		// if (rand(vTexCoord + vec2(uTimeElapsed * 0.5)) < 0.5)
 		// {

@@ -5,7 +5,7 @@
   "description": "GPU",
   "scripts": {
     "start": "wzrd src/js/main.js:gpu.min.js",
-    "prepublish": "browserify src/js/main.js | uglifyjs -cm > gpu.min.js"
+    "prepublish": "browserify src/js/main.js > gpu.min.js"
   },
   "browserify": {
     "transform": [
