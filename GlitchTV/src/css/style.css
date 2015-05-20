@@ -22,16 +22,20 @@ video
 }
 
 select
+, button
+, .slider
 {
     text-align: center;
     position: relative;
-    right: 0;
     width: 100%;
+    cursor: pointer;
 }
 
 option
+, button
 {
     padding: 4px;
+    cursor: pointer;
 }
 
 a:link 
@@ -67,16 +71,9 @@ a:active
     visibility: hidden;
 }
 
-#info
-{
-    position: fixed;
-    left: 16px;
-    bottom: 16px;
-    z-index: 1;
-}
-
 #menu
 {
+    width: 200px;
     position: fixed;
     left: 16px;
     top: 16px;
@@ -85,25 +82,9 @@ a:active
     visibility: hidden;
 }
 
-#menuVideo
-{
-}
-
-#menuShader
-, #titleShader
-, #infoSlider
-, #infoShader
+.title
 {
     margin-top: 8px;
-}
-
-#sliderTreshold
-{
-    width: 100%;
-}
-
-#autoTreshold
-{
 }
 
 .text

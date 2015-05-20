@@ -17,9 +17,13 @@ var videoList =
     , url: 'src/video/Depeche Mode - Enjoy The Silence (Low).mp4' 
   }
   , { 
-    title: 'Vince Mcmahons'
-    , url: 'src/video/vince.ogv' 
+    title: 'Iron'
+    , url: 'src/video/Iron.webm' 
   }
+  // , { 
+  //   title: 'Vince Mcmahons'
+  //   , url: 'src/video/vince.ogv' 
+  // }
   , { 
     title: 'Dance Ozlem Kahraman'
     , url: 'src/video/Dance from ozlem kahraman from vimeo.mp4' 
@@ -52,11 +56,15 @@ exports.GetVideoURL = function ()
 var shaderList = 
 [ 
   { 
-    title: 'Liquid Painting'
-    , infos: 'Interaction<br/>Mouse to change force direction'
+    title: 'Painting'
+    , infos: 'Use mouse to change direction'
   }
   , { 
-    title: 'Fake Data Moshing'
+    title: 'Lossy Data'
+    , infos: ''
+  }
+  , { 
+    title: 'Pixel Rain'
     , infos: ''
   }
 ]
@@ -72,6 +80,9 @@ for (var i = 0; i < shaderList.length; ++i)
   document.getElementById('menuShader').appendChild(shaderListElement)
 }
 
+exports.shaderList = shaderList
+exports.shaderListElement = shaderListElement
+
 exports.GetShaderSelected = function ()
 {
   return shaderListElement.selectedIndex
@@ -82,35 +93,75 @@ exports.GetShaderInfo = function ()
   return shaderList[shaderListElement.selectedIndex].infos
 }
 
-exports.shaderList = shaderList
-exports.shaderListElement = shaderListElement
-exports.shaderInfoElement = document.getElementById('infoShader')
 
-var videoTresholdSlider = document.getElementById('videoTresholdSlider')
-var autoTresholdCheckbox = document.getElementById('autoTresholdCheckbox')
+// Interaction
 
-function toggleSlider ()
+var buttonInteraction = document.getElementById('buttonInteraction')
+buttonInteraction.addEventListener('click', function (e)
 {
-  if (autoTresholdCheckbox.checked)
+  exports.isInteractionEnabled = !exports.isInteractionEnabled
+
+  if (exports.isInteractionEnabled)
   {
-    videoTresholdSlider.style.display = 'none'
+    exports.buttonInteraction.style.textDecoration = 'none'
   }
   else
   {
-    videoTresholdSlider.style.display = 'block'
+    exports.buttonInteraction.style.textDecoration = 'line-through'
   }
-}
-
-autoTresholdCheckbox.checked = true
-videoTresholdSlider.value = 50
-toggleSlider()
-
-autoTresholdCheckbox.addEventListener('change', function (e)
-{
-  toggleSlider()
 })
 
-exports.videoTresholdSlider = videoTresholdSlider
-exports.autoTresholdCheckbox = autoTresholdCheckbox
+exports.buttonInteraction = buttonInteraction
+exports.isInteractionEnabled = true
+
+
+var MenuOption = function ( id, optionName )
+{
+  this.id = id
+  this.optionName = optionName
+  this.button = document.getElementById('button' + id)
+  this.slider = document.getElementById('slider' + id)
+  this.slider.value = 50
+  this.isEnabled = true
+  var self = this
+  this.set = function (enable)
+  {
+    this.isEnabled = enable
+    this.update()
+  }
+  this.toggle = function ()
+  {
+    this.isEnabled = !this.isEnabled
+    this.update()
+  }
+  this.update = function ()
+  {
+    if (this.isEnabled)
+    {
+      this.slider.style.display = 'block'
+      this.button.innerHTML = 'Disable ' + this.optionName
+    }
+    else
+    {
+      this.slider.style.display = 'none'
+      this.button.innerHTML = 'Enable ' + this.optionName
+    }
+  }
+
+  this.button.addEventListener('click', function (e)
+  {
+    self.toggle()
+  })
+
+  return this
+}
+
+// Shader Options
+exports.buttonClear = document.getElementById('buttonClear')
+
+exports.optionTreshold = new MenuOption('Treshold', 'Manual Treshold')
+exports.optionRGBOffset = new MenuOption('RGB', 'RGB Offset')
+exports.optionTreshold.set(false)
+exports.optionRGBOffset.set(true)
 
 menuContainerElement.style.visibility = 'visible'

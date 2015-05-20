@@ -16,8 +16,10 @@ uniform vec2 uMouse;
 varying vec2 vTexCoord;
 
 uniform float uTimeElapsed;
-uniform float uAutoTreshold;
-uniform float uSliderRatio;
+uniform float uEnableTresholdAuto;
+uniform float uSliderTreshold;
+uniform float uEnableRGBOffset;
+uniform float uSliderRGBOffset;
 
 float rand(vec2 co){ return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
 float luminance ( vec3 color ) { return (color.r + color.g + color.b) / 3.0; }
@@ -56,17 +58,19 @@ void main()
    	uvDisplaced = mod(abs(uvDisplaced), 1.0);
 
    	// RGB Offset
-   	vec4 color = texture2D(uBuffer, vTexCoord);
-   	float angle = rand(uvDisplaced) * PI2;
-   	float size = luminance(color.rgb) * 0.001;
-   	color.r = texture2D(uBuffer, uvDisplaced + vec2(cos(angle), sin(angle)) * size).r;
-   	color.g = texture2D(uBuffer, uvDisplaced + vec2(cos(angle + RADTier), sin(angle + RADTier)) * size).g;
-   	color.b = texture2D(uBuffer, uvDisplaced + vec2(cos(angle + RAD2Tier), sin(angle + RAD2Tier)) * size).b;
+   	vec4 color = texture2D(uBuffer, uvDisplaced);
 
    	// Video color
 	vec4 video = texture2D(uVideo, uv);
-	
-	float treshold = mix(uSliderRatio, 0.3 + 0.2 * t, uAutoTreshold);
+
+	// RGB Offset
+   	float angle = uTimeElapsed * 0.01;
+   	float size = mix(0.0, 0.01 * uSliderRGBOffset, uEnableRGBOffset);
+   	video.r = texture2D(uVideo, uv + vec2(cos(angle), sin(angle)) * size).r;
+   	video.g = texture2D(uVideo, uv + vec2(cos(angle + RADTier), sin(angle + RADTier)) * size).g;
+   	video.b = texture2D(uVideo, uv + vec2(cos(angle + RAD2Tier), sin(angle + RAD2Tier)) * size).b;
+
+	float treshold = mix(uSliderTreshold, 0.3 + 0.2 * t, uEnableTresholdAuto);
 
 	// Reinject video if colors are too much different
 	color = mix(color, video, step(treshold, distance(color.rgb, video.rgb)));

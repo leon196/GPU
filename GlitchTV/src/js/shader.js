@@ -44,16 +44,23 @@ exports.Glitch = function ( gl, fragmentSource )
 		this.setup()
 	}
 
-	this.update = function ( timeElapsed, mouseX, mouseY )
+	this.update = function ( timeElapsed, isInteractionEnabled, mouseX, mouseY )
 	{
 	    this.shader.uniforms.uMouse = [mouseX, mouseY]
+	    this.shader.uniforms.uInteractionEnabled = isInteractionEnabled ? 1 : 0
 	    this.shader.uniforms.uTimeElapsed = timeElapsed
 	}
 
-    this.updateTreshold = function ( isAuto, sliderRatio )
+    this.updateTreshold = function ( menuOption )
     {
-    	this.shader.uniforms.uAutoTreshold = isAuto ? 1 : 0
-    	this.shader.uniforms.uSliderRatio = sliderRatio
+    	this.shader.uniforms.uEnableTresholdAuto = menuOption.isEnabled ? 0 : 1
+    	this.shader.uniforms.uSliderTreshold = menuOption.slider.value / 100
+    }
+
+    this.updateRGBOffset = function ( menuOption )
+    {
+    	this.shader.uniforms.uEnableRGBOffset = menuOption.isEnabled ? 1 : 0
+    	this.shader.uniforms.uSliderRGBOffset = menuOption.slider.value / 100
     }
 
 	this.updateBuffer = function ( sampler2D )

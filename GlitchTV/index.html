@@ -12,21 +12,22 @@
         <video id='video'></video>
 
         <div class='text' id='menu'>
-            <div id='menuVideo'>Video</div>
-            <div id='menuShader'>Shader</div>
-            <div id='infoShader'></div>
-            <div id='infoSlider'><label>Video Treshold Automatic <input type="checkbox" id="autoTresholdCheckbox"></label></div>
-            <input type='range' id='videoTresholdSlider' min='0' max='100'>
-        </div>
-
-        <div class='text' id='info'>
-            Research and development for Glitch Processing Unit
+            <div class='title'>About</div>
+            <a href='http://www.mechbird.fr/en/gpu.html' target='_blank'><button type='button'>mechbird.fr/en/gpu</button></a>
+            <div class='title'>Sources</div>
+            <a href='https://github.com/leon196/GPU' target='_blank'><button type='button'>github.com/leon196/GPU</button></a>
+            <div class='title' id='menuVideo'>Video</div>
+            <div class='title' id='menuShader'>Shader</div>
+            <div class='title'>Interaction</div>
+            <button type='button' id='buttonInteraction'></button>
+            <div class='title'>Options</div>
+            <button type='button' id='buttonClear'>Clear Buffer</button>
+            <button type='button' id='buttonTreshold'></button>
             <br/>
-            More infos : <a href='http://www.mechbird.fr/en/gpu.html' target='_blank'>mechbird.fr/en/gpu</a>
+            <input class='slider' type='range' id='sliderTreshold' min='0' max='100'>
+            <button type='button' id='buttonRGB'></button>
             <br/>
-            Dev Videos : <a href='https://vimeo.com/album/3397195' target='_blank'>vimeo.com/album/3397195</a>
-            <br/>
-            Sources : <a href='https://github.com/leon196/GPU' target='_blank'>github.com/leon196/GPU</a>
+            <input class='slider' type='range' id='sliderRGB' min='0' max='100'>
         </div>
 
 
