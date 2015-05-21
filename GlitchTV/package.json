@@ -17,6 +17,7 @@
     , "glslify": "^2.0.0"
     , "gl-fbo": "^2.0.3"
     , "gl-texture2d": "^2.0.8"
+    , "gl-gif": "^3.1.0"
     , "a-big-triangle" : "^1.0.0"
     , "canvas-fit": "^1.2.0"
 

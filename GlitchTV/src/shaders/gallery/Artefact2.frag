@@ -36,7 +36,7 @@ void main()
 	vec2 mouse = uMouse / uResolution;
 	mouse.y = 1.0 - mouse.y;
 
-    float t = sin(uTimeElapsed * 0.001) * 0.5 + 0.5;
+    float t = sin(uTimeElapsed) * 0.5 + 0.5;
 
    	vec4 color = texture2D(uBuffer, vTexCoord);
 
@@ -51,7 +51,7 @@ void main()
 	vec4 video = texture2D(uVideo, uv);
 
 	// RGB Offset
-   	float angle = uTimeElapsed * 0.01;
+   	float angle = uTimeElapsed * 10.0;
    	float size = mix(0.0, 0.01 * uSliderRGBOffset, uEnableRGBOffset);
    	video.r = texture2D(uVideo, uv + vec2(cos(angle), sin(angle)) * size).r;
    	video.g = texture2D(uVideo, uv + vec2(cos(angle + RADTier), sin(angle + RADTier)) * size).g;

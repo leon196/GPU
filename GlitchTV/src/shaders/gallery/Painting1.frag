@@ -42,7 +42,7 @@ void main()
     float angle = atan(p.y, p.x);
     float radius = length(p);
 
-    float t = sin(uTimeElapsed * 0.001) * 0.5 + 0.5;
+    float t = sin(uTimeElapsed) * 0.5 + 0.5;
 
    	// Displacement
    	vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.002 - 0.002 * t);
@@ -56,7 +56,7 @@ void main()
 	vec4 video = texture2D(uVideo, uv);
 
 	// RGB Offset
-   	angle = uTimeElapsed * 0.01;
+   	angle = uTimeElapsed * 10.0;
    	float size = mix(0.0, 0.01 * uSliderRGBOffset, uEnableRGBOffset);
    	video.r = texture2D(uVideo, uv + vec2(cos(angle), sin(angle)) * size).r;
    	video.g = texture2D(uVideo, uv + vec2(cos(angle + RADTier), sin(angle + RADTier)) * size).g;

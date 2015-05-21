@@ -28,6 +28,29 @@ exports.Glitch = function ( gl, fragmentSource )
 		// Uniform index for video
 		gl.uniform1i( gl.getUniformLocation( this.shader.program, "uVideo" ) , 7 )
 
+		// Uniform laplacian filter
+		// From Anton Roy -> https://www.shadertoy.com/view/Xs23DG
+		var uLaplacianFilter5x5 = [
+			-1,-1,-1,-1,-1,
+			-1,-1,-1,-1,-1, 
+			-1,-1,24,-1,-1, 
+			-1,-1,-1,-1,-1, 
+			-1,-1,-1,-1,-1];
+		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "uLaplacianFilter5x5"), new Float32Array(uLaplacianFilter5x5));
+
+		// http://homepages.inf.ed.ac.uk/rbf/HIPR2/log.htm
+		var uLaplacianFilter9x9 = [
+			0,1,1,2,2,2,1,1,0,
+			1,2,4,5,5,5,4,2,1,
+			1,4,5,3,0,3,5,4,1,
+			2,5,3,-12,-24,-12,3,5,2,
+			2,5,0,-24,-40,-24,0,5,2,
+			2,5,3,-12,-24,-12,3,5,2,
+			1,4,5,3,0,3,5,4,1,
+			1,2,4,5,5,5,4,2,1,
+			0,1,1,2,2,2,1,1,0];
+		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "uLaplacianFilter9x9"), new Float32Array(uLaplacianFilter9x9));
+
 		// Resolution
 		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "uBufferResolution" ), new Float32Array([ settings.fbo.width , settings.fbo.height ]))
 		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "uResolution" ), new Float32Array([ settings.screen.width , settings.screen.height ]))
@@ -54,13 +77,13 @@ exports.Glitch = function ( gl, fragmentSource )
     this.updateTreshold = function ( menuOption )
     {
     	this.shader.uniforms.uEnableTresholdAuto = menuOption.isEnabled ? 0 : 1
-    	this.shader.uniforms.uSliderTreshold = menuOption.slider.value / 100
+    	this.shader.uniforms.uSliderTreshold = menuOption.slider.value / 1000
     }
 
     this.updateRGBOffset = function ( menuOption )
     {
     	this.shader.uniforms.uEnableRGBOffset = menuOption.isEnabled ? 1 : 0
-    	this.shader.uniforms.uSliderRGBOffset = menuOption.slider.value / 100
+    	this.shader.uniforms.uSliderRGBOffset = menuOption.slider.value / 1000
     }
 
 	this.updateBuffer = function ( sampler2D )
@@ -94,18 +117,36 @@ exports.Glitch = function ( gl, fragmentSource )
 
 exports.Simple = function ( gl )
 {
-	this.glslify = createShader(gl
+	this.gl = gl
+	this.shader = createShader(gl
 		, glslify(__dirname + '/../shaders/simple.vert')
 		, glslify(__dirname + '/../shaders/simple.frag'))
 
+	this.shader.attributes.aPosition.location = 0
+
+	this.shader.bind()
+
+	// Uniform index for buffer
+	gl.uniform1i( gl.getUniformLocation( this.shader.program, "uBuffer" ), 1 )
+
+	// Uniform index for video
+	gl.uniform1i( gl.getUniformLocation( this.shader.program, "uVideo" ) , 6 )
+
 	this.bind = function ()
 	{
-		this.glslify.bind()
+		this.shader.bind()
 	}
 
 	this.updateBuffer = function ( sampler2D )
 	{
-		this.glslify.uniforms.uBuffer = sampler2D
+	    this.gl.activeTexture(this.gl.TEXTURE1)
+		this.shader.uniforms.uBuffer = sampler2D
+	}
+
+	this.updateVideo = function ( sampler2D )
+	{
+	    this.gl.activeTexture(this.gl.TEXTURE6)
+		this.shader.uniforms.uVideo = sampler2D
 	}
 
 	return this

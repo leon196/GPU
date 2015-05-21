@@ -9,12 +9,12 @@ exports.menuContainerElement = menuContainerElement
 var videoList = 
 [ 
   { 
-    title: 'VH1 Classic'
-    , url: 'src/video/vh1.ogv' 
-  }
-  , { 
     title: 'Depeche Mode'
     , url: 'src/video/Depeche Mode - Enjoy The Silence (Low).mp4' 
+  }
+  , { 
+    title: 'Dance Ozlem Kahraman'
+    , url: 'src/video/Dance from ozlem kahraman from vimeo.mp4' 
   }
   , { 
     title: 'Iron'
@@ -25,8 +25,8 @@ var videoList =
   //   , url: 'src/video/vince.ogv' 
   // }
   , { 
-    title: 'Dance Ozlem Kahraman'
-    , url: 'src/video/Dance from ozlem kahraman from vimeo.mp4' 
+    title: 'VH1 Classic'
+    , url: 'src/video/vh1.ogv' 
   }
 ]
 
@@ -49,6 +49,10 @@ exports.GetVideoURL = function ()
   return videoList[videoListElement.selectedIndex].url
 }
 
+// Video Control
+var videoSlider = document.getElementById('sliderVideo')
+exports.videoSlider = videoSlider
+
 ////////////
 // SHADER //
 ////////////
@@ -56,8 +60,8 @@ exports.GetVideoURL = function ()
 var shaderList = 
 [ 
   { 
-    title: 'Painting'
-    , infos: 'Use mouse to change direction'
+    title: 'Laplacian Fire'
+    , infos: ''
   }
   , { 
     title: 'Lossy Data'
@@ -66,6 +70,10 @@ var shaderList =
   , { 
     title: 'Pixel Rain'
     , infos: ''
+  }
+  , { 
+    title: 'Painting'
+    , infos: 'Use mouse to change direction'
   }
 ]
 
@@ -121,7 +129,7 @@ var MenuOption = function ( id, optionName )
   this.optionName = optionName
   this.button = document.getElementById('button' + id)
   this.slider = document.getElementById('slider' + id)
-  this.slider.value = 50
+  this.slider.value = 500
   this.isEnabled = true
   var self = this
   this.set = function (enable)
@@ -162,6 +170,6 @@ exports.buttonClear = document.getElementById('buttonClear')
 exports.optionTreshold = new MenuOption('Treshold', 'Manual Treshold')
 exports.optionRGBOffset = new MenuOption('RGB', 'RGB Offset')
 exports.optionTreshold.set(false)
-exports.optionRGBOffset.set(true)
+exports.optionRGBOffset.set(false)
 
 menuContainerElement.style.visibility = 'visible'
