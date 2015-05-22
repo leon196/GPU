@@ -1,6 +1,4 @@
 
-// inspired by http://glslsandbox.com/e#25072.0
-
 precision mediump float;
 
 #define PI 3.141592653589
@@ -24,10 +22,7 @@ uniform float uSliderTreshold;
 uniform float uEnableRGBOffset;
 uniform float uSliderRGBOffset;
 
-float rand(vec2 co){ return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
-float luminance ( vec3 color ) { return (color.r + color.g + color.b) / 3.0; }
-vec2 pixelize(vec2 uv, float details) { return floor(uv.xy * details) / details; }
-vec3 posterize ( vec3 color, float details ) { return floor(color * details) / details; }
+#pragma glslify: luminance = require(../utils/luminance.glsl)
 
 void main() 
 {
@@ -43,15 +38,13 @@ void main()
     float radius = length(p);
 
     float t = sin(uTimeElapsed) * 0.5 + 0.5;
+    float t2 = sin(uTimeElapsed * 2.0) * 0.5 + 0.5;
 
-   	// Displacement
-   	vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.002 - 0.002 * t);
-   	angle = rand(p) * PI2;
-   	force += vec2(cos(angle), sin(angle)) * 0.001;
-   	vec2 uvDisplaced = vec2(0.5) + force - mouse * 0.01 * uInteractionEnabled;
-   	uvDisplaced = mod(abs(uvDisplaced), 1.0);
+    vec4 color = texture2D(uBuffer, vTexCoord);
 
-	vec4 color = texture2D(uBuffer, uvDisplaced);
+    float light = luminance(color.rgb);
+	float treshold = mix(uSliderTreshold, 0.3 + 0.2 * t, uEnableTresholdAuto);
+   	color = mix(color, vec4(vec3(0.0), 1.0), step(treshold, light));
 
 	vec4 video = texture2D(uVideo, uv);
 
@@ -62,12 +55,10 @@ void main()
  	video.g = texture2D(uVideo, uv + vec2(cos(angle + RADTier), sin(angle + RADTier)) * size).g;
  	video.b = texture2D(uVideo, uv + vec2(cos(angle + RAD2Tier), sin(angle + RAD2Tier)) * size).b;
 
-	// Pixel center give allways video
-	color = mix(color, video, step(radius, 1.0 / uBufferResolution.x));
+  	float difference = distance(color.rgb, video.rgb);
 
 	// Update buffer if color difference with video is greater than treshold
-	float treshold = mix(uSliderTreshold, 0.3 + 0.2 * t, uEnableTresholdAuto);
-	color = mix(color, video, step(treshold, distance(color.rgb, video.rgb)));
+	color = mix(color, video, step(treshold, difference));
 
 	gl_FragColor = color;
 }

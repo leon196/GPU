@@ -51,6 +51,15 @@ exports.Glitch = function ( gl, fragmentSource )
 			0,1,1,2,2,2,1,1,0];
 		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "uLaplacianFilter9x9"), new Float32Array(uLaplacianFilter9x9));
 
+		//
+		var uBlurFilter5x5 = [
+			0.0,0.05,0.05,0.05,0.0,
+			0.05,0.1,0.1,0.1,0.05, 
+			0.05,0.1,0.2,0.1,0.05, 
+			0.05,0.1,0.1,0.1,0.05, 
+			0.0,0.05,0.05,0.05,0.0];
+		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "uBlurFilter5x5"), new Float32Array(uBlurFilter5x5));
+
 		// Resolution
 		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "uBufferResolution" ), new Float32Array([ settings.fbo.width , settings.fbo.height ]))
 		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "uResolution" ), new Float32Array([ settings.screen.width , settings.screen.height ]))

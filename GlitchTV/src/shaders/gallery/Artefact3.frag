@@ -43,15 +43,17 @@ void main()
     float radius = length(p);
 
     float t = sin(uTimeElapsed) * 0.5 + 0.5;
+    float t2 = sin(uTimeElapsed * 2.0) * 0.5 + 0.5;
+
+    vec4 color = texture2D(uBuffer, vTexCoord);
 
    	// Displacement
-   	vec2 force = vec2(cos(angle), sin(angle)) * (radius - 0.002 - 0.002 * t);
-   	angle = rand(p) * PI2;
-   	force += vec2(cos(angle), sin(angle)) * 0.001;
-   	vec2 uvDisplaced = vec2(0.5) + force - mouse * 0.01 * uInteractionEnabled;
+   	angle = luminance(color.rgb) * PI2;
+   	vec2 force = vec2(cos(angle), sin(angle)) * 0.004;
+   	vec2 uvDisplaced = vTexCoord + force;
    	uvDisplaced = mod(abs(uvDisplaced), 1.0);
 
-	vec4 color = texture2D(uBuffer, uvDisplaced);
+	color = texture2D(uBuffer, uvDisplaced);
 
 	vec4 video = texture2D(uVideo, uv);
 
@@ -62,12 +64,11 @@ void main()
  	video.g = texture2D(uVideo, uv + vec2(cos(angle + RADTier), sin(angle + RADTier)) * size).g;
  	video.b = texture2D(uVideo, uv + vec2(cos(angle + RAD2Tier), sin(angle + RAD2Tier)) * size).b;
 
-	// Pixel center give allways video
-	color = mix(color, video, step(radius, 1.0 / uBufferResolution.x));
+	float treshold = mix(uSliderTreshold, 0.3 + 0.2 * t, uEnableTresholdAuto);
+  	float difference = distance(color.rgb, video.rgb);
 
 	// Update buffer if color difference with video is greater than treshold
-	float treshold = mix(uSliderTreshold, 0.3 + 0.2 * t, uEnableTresholdAuto);
-	color = mix(color, video, step(treshold, distance(color.rgb, video.rgb)));
+	color = mix(color, video, step(treshold, difference));
 
 	gl_FragColor = color;
 }

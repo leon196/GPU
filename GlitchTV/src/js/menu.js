@@ -1,3 +1,5 @@
+var glslify = require('glslify')
+
 
 var menuContainerElement = document.getElementById('menu')
 exports.menuContainerElement = menuContainerElement
@@ -60,20 +62,44 @@ exports.videoSlider = videoSlider
 var shaderList = 
 [ 
   { 
-    title: 'Laplacian Fire'
+    title: 'Color Direction'
     , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Artefact3.frag')
   }
   , { 
-    title: 'Lossy Data'
+    title: 'Fake Data Moshing'
     , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Artefact1.frag')
+  }
+  , { 
+    title: 'Pixel Expansion'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Artefact4.frag')
   }
   , { 
     title: 'Pixel Rain'
     , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Artefact2.frag')
   }
   , { 
-    title: 'Painting'
+    title: 'Water Painting'
     , infos: 'Use mouse to change direction'
+    , source: glslify(__dirname + '/../shaders/gallery/Painting1.frag')
+  }
+  , { 
+    title: 'Edge Fire'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Fire1.frag')
+  }
+  , { 
+    title: 'Full Fire'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Fire2.frag')
+  }
+  , { 
+    title: 'Game Of Life'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/GameOfLife.frag')
   }
 ]
 
@@ -101,6 +127,11 @@ exports.GetShaderInfo = function ()
   return shaderList[shaderListElement.selectedIndex].infos
 }
 
+exports.GetFragmentSource = function ()
+{
+  return shaderList[shaderListElement.selectedIndex].source
+}
+
 
 // Interaction
 
@@ -120,7 +151,7 @@ buttonInteraction.addEventListener('click', function (e)
 })
 
 exports.buttonInteraction = buttonInteraction
-exports.isInteractionEnabled = true
+exports.isInteractionEnabled = false
 
 
 var MenuOption = function ( id, optionName )
@@ -171,5 +202,6 @@ exports.optionTreshold = new MenuOption('Treshold', 'Manual Treshold')
 exports.optionRGBOffset = new MenuOption('RGB', 'RGB Offset')
 exports.optionTreshold.set(false)
 exports.optionRGBOffset.set(false)
+// exports.optionRGBOffset.slider.value = 100
 
 menuContainerElement.style.visibility = 'visible'
