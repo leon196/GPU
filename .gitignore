@@ -1,3 +1,9 @@
 video/
+videos/
 *.zip
+*.webm
+*.ogv
+*.avi
 
+node_modules/
+2/node_modules/

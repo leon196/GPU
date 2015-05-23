@@ -1,0 +1,33 @@
+{
+  "name": "GPU",
+  "version": "0.2.0",
+  "private": true,
+  "description": "GPU",
+  "scripts": {
+    "start": "wzrd src/js/main.js:gpu.min.js",
+    "prepublish": "browserify -t glslify src/js/main.js > gpu.min.js"
+  },
+  "browserify": {
+    "transform": [ "glslify" ]
+  },
+  "dependencies": 
+  {
+    "gl-now": "^1.4.0"
+    , "gl-shader": "^4.0.0"
+    , "glslify": "^2.0.0"
+    , "gl-fbo": "^2.0.3"
+    , "gl-texture2d": "^2.0.8"
+    , "gl-gif": "^3.1.0"
+    , "a-big-triangle" : "^1.0.0"
+    , "canvas-fit": "^1.2.0"
+
+    , "ndarray" : "^1.0.16"
+    , "ndarray-fill" : "^1.0.0"
+
+    , "right-now": "^1.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^8.0.3",
+    "wzrd": "^1.1.0"
+  }
+}

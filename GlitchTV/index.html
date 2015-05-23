@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <title>GlitchTV</title>
+        <link rel='stylesheet' type='text/css' href='src/css/style.css' />
+        <link rel='stylesheet' type='text/css' href='src/font/bebasneue-bold0.css'>
+    </head>
+    <body>
+        <div id='font'>font</div>
+        <div id='loader'></div>
+        <video id='video'></video>
+
+        <div class='text' id='menu'>
+            <div class='title'>About</div>
+            <a href='http://www.mechbird.fr/en/gpu.html' target='_blank'><button type='button'>mechbird.fr/en/gpu</button></a>
+            <div class='title'>Sources</div>
+            <a href='https://github.com/leon196/GPU' target='_blank'><button type='button'>github.com/leon196/GPU</button></a>
+            <div class='title' id='menuVideo'>Video</div>
+            <input class='slider' type='range' id='sliderVideo' min='0' max='1000'>
+            <div class='title' id='menuShader'>Shader</div>
+            <div class='title' style='display: none'>Interaction</div>
+            <button type='button' id='buttonInteraction' style='display: none'></button>
+            <div class='title'>Options</div>
+            <button type='button' id='buttonClear'>Clear Buffer</button>
+            <button type='button' id='buttonTreshold'></button>
+            <br/>
+            <input class='slider' type='range' id='sliderTreshold' min='0' max='1000'>
+            <button type='button' id='buttonRGB'></button>
+            <br/>
+            <input class='slider' type='range' id='sliderRGB' min='0' max='1000'>
+        </div>
+
+
+
+        <script charset='utf-8' src='gpu.min.js'></script>
+    </body>
+</html>
