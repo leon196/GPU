@@ -27,7 +27,6 @@ var fboList, current = 0
 var picture, video
 var shouldClearBuffer
 
-
 shell.on('gl-init', function ()
 {
   var gl = shell.gl
@@ -81,6 +80,18 @@ shell.on('gl-init', function ()
   menu.buttonClear.addEventListener('click', function (e)
   {
     shouldClearBuffer = true
+  })
+
+  //
+  menu.buttonPlay.addEventListener('click', function (e)
+  {
+    video.domElement.play()
+  })
+
+  //
+  menu.buttonPause.addEventListener('click', function (e)
+  {
+    video.domElement.pause()
   })
 
   // 

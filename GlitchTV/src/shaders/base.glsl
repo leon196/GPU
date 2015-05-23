@@ -41,25 +41,4 @@ uniform float filter9x9[81];
 #pragma glslify: rgbOffset = require(../utils/rgbOffset.glsl)
 #pragma glslify: fadeOut = require(../utils/fadeOut.glsl)
 #pragma glslify: hsl2rgb = require(glsl-hsl2rgb)
-
-#pragma glslify: forceFromLight = require(../utils/forceFromLight.glsl)
-#pragma glslify: updateBufferWithColorDifference = require(../utils/updateBufferWithColorDifference.glsl)
-
-void main() 
-{
-  vec2 uv = videoUV(vTexCoord);
-
-  vec2 force = forceFromLight(video, pixelize(uv, 32.0), bufferSize);
-  vec2 uvDisplaced = wrapUV(vTexCoord - normalize(force) * 0.002);
-
-  vec4 colorFbo = texture2D(fbo, uvDisplaced);
-
-  float angle = time * 10.0;
-  float radius = mix(0.01 * sliderRGBOffset, 0.005 * oscillation(time, 2.0), isAutomatic);
-
-  vec4 colorVideo = rgbOffset(video, uv, angle, radius);
-
-  float treshold = mix(sliderTreshold, 0.3 + 0.2 * oscillation(time, 1.0), isAutomatic);
-
-	gl_FragColor = updateBufferWithColorDifference(colorFbo, colorVideo, treshold);
-}
+#pragma glslify: applyFilter5x5 = require(../utils/filter5x5.glsl)

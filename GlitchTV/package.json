@@ -8,23 +8,26 @@
     "prepublish": "browserify -t glslify src/js/main.js > gpu.min.js"
   },
   "browserify": {
-    "transform": [ "glslify" ]
+    "transform": [
+      "glslify"
+    ]
   },
-  "dependencies": 
-  {
-    "gl-now": "^1.4.0"
-    , "gl-shader": "^4.0.0"
-    , "glslify": "^2.0.0"
-    , "gl-fbo": "^2.0.3"
-    , "gl-texture2d": "^2.0.8"
-    , "gl-gif": "^3.1.0"
-    , "a-big-triangle" : "^1.0.0"
-    , "canvas-fit": "^1.2.0"
-
-    , "ndarray" : "^1.0.16"
-    , "ndarray-fill" : "^1.0.0"
-
-    , "right-now": "^1.0.0"
+  "dependencies": {
+    "a-big-triangle": "^1.0.0",
+    "canvas-fit": "^1.2.0",
+    "gl-fbo": "^2.0.3",
+    "gl-now": "^1.4.0",
+    "gl-shader": "^4.0.0",
+    "gl-texture2d": "^2.0.8",
+    "glsl-hsl2rgb": "^1.1.0",
+    "glsl-luma": "^1.0.1",
+    "glsl-random": "0.0.5",
+    "glslify": "^2.0.0",
+    "glslify-hex": "^2.0.1",
+    "glslify-import": "^1.0.0",
+    "ndarray": "^1.0.16",
+    "ndarray-fill": "^1.0.0",
+    "right-now": "^1.0.0"
   },
   "devDependencies": {
     "browserify": "^8.0.3",

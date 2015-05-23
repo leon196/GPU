@@ -17,17 +17,23 @@
             <div class='title'>Sources</div>
             <a href='https://github.com/leon196/GPU' target='_blank'><button type='button'>github.com/leon196/GPU</button></a>
             <div class='title' id='menuVideo'>Video</div>
+            <button type='button' id='buttonPlay'>Play</button>
+            <button type='button' id='buttonPause'>Pause</button>
             <input class='slider' type='range' id='sliderVideo' min='0' max='1000'>
             <div class='title' id='menuShader'>Shader</div>
-            <div class='title' style='display: none'>Interaction</div>
-            <button type='button' id='buttonInteraction' style='display: none'></button>
+            <div class='hide title'>Interaction</div>
+            <button type='button' id='buttonInteraction' class='hide'></button>
             <div class='title'>Options</div>
             <button type='button' id='buttonClear'>Clear Buffer</button>
-            <button type='button' id='buttonTreshold'></button>
-            <br/>
+
+            <button type='button' id='buttonTreshold' class='hide'></button>
+
+            <div class='title'>Buffer Treshold</div>
             <input class='slider' type='range' id='sliderTreshold' min='0' max='1000'>
-            <button type='button' id='buttonRGB'></button>
-            <br/>
+
+            <button type='button' id='buttonRGB' class='hide'></button>
+
+            <div class='title'>RGB Offset</div>
             <input class='slider' type='range' id='sliderRGB' min='0' max='1000'>
         </div>
 

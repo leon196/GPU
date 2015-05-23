@@ -20,13 +20,17 @@ exports.Glitch = function ( gl, fragmentSource )
 		this.shader.bind()
 
 		// Uniform index for buffer
-		gl.uniform1i( gl.getUniformLocation( this.shader.program, "uBuffer" ), 0 )
+		gl.uniform1i( gl.getUniformLocation( this.shader.program, "fbo" ), 0 )
 
 		// Uniform index for picture
-		gl.uniform1i( gl.getUniformLocation( this.shader.program, "uPicture" ), 4 )
+		gl.uniform1i( gl.getUniformLocation( this.shader.program, "picture" ), 4 )
 
 		// Uniform index for video
-		gl.uniform1i( gl.getUniformLocation( this.shader.program, "uVideo" ) , 7 )
+		gl.uniform1i( gl.getUniformLocation( this.shader.program, "video" ) , 7 )
+
+		// Resolution
+		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "bufferSize" ), new Float32Array([ settings.fbo.width , settings.fbo.height ]))
+		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "screenSize" ), new Float32Array([ settings.screen.width , settings.screen.height ]))
 
 		// Uniform laplacian filter
 		// From Anton Roy -> https://www.shadertoy.com/view/Xs23DG
@@ -36,7 +40,7 @@ exports.Glitch = function ( gl, fragmentSource )
 			-1,-1,24,-1,-1, 
 			-1,-1,-1,-1,-1, 
 			-1,-1,-1,-1,-1];
-		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "uLaplacianFilter5x5"), new Float32Array(uLaplacianFilter5x5));
+		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "filter5x5"), new Float32Array(uLaplacianFilter5x5));
 
 		// http://homepages.inf.ed.ac.uk/rbf/HIPR2/log.htm
 		var uLaplacianFilter9x9 = [
@@ -49,20 +53,16 @@ exports.Glitch = function ( gl, fragmentSource )
 			1,4,5,3,0,3,5,4,1,
 			1,2,4,5,5,5,4,2,1,
 			0,1,1,2,2,2,1,1,0];
-		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "uLaplacianFilter9x9"), new Float32Array(uLaplacianFilter9x9));
+		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "filter9x9"), new Float32Array(uLaplacianFilter9x9));
 
 		//
-		var uBlurFilter5x5 = [
-			0.0,0.05,0.05,0.05,0.0,
-			0.05,0.1,0.1,0.1,0.05, 
-			0.05,0.1,0.2,0.1,0.05, 
-			0.05,0.1,0.1,0.1,0.05, 
-			0.0,0.05,0.05,0.05,0.0];
-		gl.uniform1fv(gl.getUniformLocation(this.shader.program, "uBlurFilter5x5"), new Float32Array(uBlurFilter5x5));
-
-		// Resolution
-		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "uBufferResolution" ), new Float32Array([ settings.fbo.width , settings.fbo.height ]))
-		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "uResolution" ), new Float32Array([ settings.screen.width , settings.screen.height ]))
+		// var uBlurFilter5x5 = [
+		// 	0.0,0.05,0.05,0.05,0.0,
+		// 	0.05,0.1,0.1,0.1,0.05, 
+		// 	0.05,0.1,0.2,0.1,0.05, 
+		// 	0.05,0.1,0.1,0.1,0.05, 
+		// 	0.0,0.05,0.05,0.05,0.0];
+		// gl.uniform1fv(gl.getUniformLocation(this.shader.program, "uBlurFilter5x5"), new Float32Array(uBlurFilter5x5));
 	}
 
 	this.bind = function ()
@@ -78,45 +78,44 @@ exports.Glitch = function ( gl, fragmentSource )
 
 	this.update = function ( timeElapsed, isInteractionEnabled, mouseX, mouseY )
 	{
-	    this.shader.uniforms.uMouse = [mouseX, mouseY]
-	    this.shader.uniforms.uInteractionEnabled = isInteractionEnabled ? 1 : 0
-	    this.shader.uniforms.uTimeElapsed = timeElapsed
+	    this.shader.uniforms.mouse = [mouseX, mouseY]
+	    this.shader.uniforms.isInteractive = 1
+	    this.shader.uniforms.isAutomatic = 0
+	    this.shader.uniforms.time = timeElapsed
 	}
 
     this.updateTreshold = function ( menuOption )
     {
-    	this.shader.uniforms.uEnableTresholdAuto = menuOption.isEnabled ? 0 : 1
-    	this.shader.uniforms.uSliderTreshold = menuOption.slider.value / 1000
+    	this.shader.uniforms.sliderTreshold = menuOption.slider.value / 1000
     }
 
     this.updateRGBOffset = function ( menuOption )
     {
-    	this.shader.uniforms.uEnableRGBOffset = menuOption.isEnabled ? 1 : 0
-    	this.shader.uniforms.uSliderRGBOffset = menuOption.slider.value / 1000
+    	this.shader.uniforms.sliderRGBOffset = menuOption.slider.value / 1000
     }
 
 	this.updateBuffer = function ( sampler2D )
 	{
 	    this.gl.activeTexture(this.gl.TEXTURE0)
-	    this.shader.uniforms.uBuffer = sampler2D
+	    this.shader.uniforms.fbo = sampler2D
 	}
 
 	this.updatePicture = function ( sampler2D )
 	{
 	    this.gl.activeTexture(this.gl.TEXTURE4)
-	    this.shader.uniforms.uPicture = sampler2D
+	    this.shader.uniforms.picture = sampler2D
 	}
 
 	this.updateVideo = function ( sampler2D )
 	{
 	    this.gl.activeTexture(this.gl.TEXTURE7)
-	    this.shader.uniforms.uVideo = sampler2D
+	    this.shader.uniforms.video = sampler2D
 	}
 
   	this.resize = function ()
   	{
 	    this.shader.bind()  
-	    this.shader.uniforms.uResolution = [ settings.screen.width , settings.screen.height ]
+	    this.shader.uniforms.screenSize = [ settings.screen.width , settings.screen.height ]
   	}
 
 	this.setup()

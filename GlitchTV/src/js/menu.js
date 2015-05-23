@@ -96,11 +96,11 @@ var shaderList =
     , infos: ''
     , source: glslify(__dirname + '/../shaders/gallery/Fire2.frag')
   }
-  , { 
-    title: 'Game Of Life'
-    , infos: ''
-    , source: glslify(__dirname + '/../shaders/gallery/GameOfLife.frag')
-  }
+  // , { 
+  //   title: 'Game Of Life'
+  //   , infos: ''
+  //   , source: glslify(__dirname + '/../shaders/gallery/GameOfLife.frag')
+  // }
 ]
 
 // Create Menu Shader
@@ -151,7 +151,7 @@ buttonInteraction.addEventListener('click', function (e)
 })
 
 exports.buttonInteraction = buttonInteraction
-exports.isInteractionEnabled = false
+exports.isInteractionEnabled = true
 
 
 var MenuOption = function ( id, optionName )
@@ -200,8 +200,15 @@ exports.buttonClear = document.getElementById('buttonClear')
 
 exports.optionTreshold = new MenuOption('Treshold', 'Manual Treshold')
 exports.optionRGBOffset = new MenuOption('RGB', 'RGB Offset')
-exports.optionTreshold.set(false)
-exports.optionRGBOffset.set(false)
+exports.optionTreshold.set(true)
+exports.optionRGBOffset.set(true)
 // exports.optionRGBOffset.slider.value = 100
 
 menuContainerElement.style.visibility = 'visible'
+
+// Video
+var buttonPlay = document.getElementById('buttonPlay')
+exports.buttonPlay = buttonPlay
+// Video
+var buttonPause = document.getElementById('buttonPause')
+exports.buttonPause = buttonPause
