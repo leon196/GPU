@@ -76,10 +76,10 @@ exports.Glitch = function ( gl, fragmentSource )
 		this.setup()
 	}
 
-	this.update = function ( timeElapsed, isInteractionEnabled, mouseX, mouseY )
+	this.update = function ( timeElapsed, menu, mouseX, mouseY )
 	{
 	    this.shader.uniforms.mouse = [mouseX, mouseY]
-	    this.shader.uniforms.isInteractive = 1
+	    this.shader.uniforms.isInteractive = 1//menu.isInteractionEnabled
 	    this.shader.uniforms.isAutomatic = 0
 	    this.shader.uniforms.time = timeElapsed
 	}
@@ -116,6 +116,7 @@ exports.Glitch = function ( gl, fragmentSource )
   	{
 	    this.shader.bind()  
 	    this.shader.uniforms.screenSize = [ settings.screen.width , settings.screen.height ]
+		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "bufferSize" ), new Float32Array([ settings.fbo.width , settings.fbo.height ]))
   	}
 
 	this.setup()
@@ -135,27 +136,50 @@ exports.Simple = function ( gl )
 	this.shader.bind()
 
 	// Uniform index for buffer
-	gl.uniform1i( gl.getUniformLocation( this.shader.program, "uBuffer" ), 1 )
+	gl.uniform1i( gl.getUniformLocation( this.shader.program, "fbo" ), 1 )
 
 	// Uniform index for video
-	gl.uniform1i( gl.getUniformLocation( this.shader.program, "uVideo" ) , 6 )
+	gl.uniform1i( gl.getUniformLocation( this.shader.program, "video" ) , 6 )
+
+	gl.uniform2fv(gl.getUniformLocation(this.shader.program, "bufferSize" ), new Float32Array([ settings.fbo.width , settings.fbo.height ]))
+	gl.uniform2fv(gl.getUniformLocation(this.shader.program, "screenSize" ), new Float32Array([ settings.screen.width , settings.screen.height ]))
+
+	var uBlurFilter5x5 = [
+		0.0,0.05,0.05,0.05,0.0,
+		0.05,0.1,0.1,0.1,0.05, 
+		0.05,0.1,0.2,0.1,0.05, 
+		0.05,0.1,0.1,0.1,0.05, 
+		0.0,0.05,0.05,0.05,0.0];
+	gl.uniform1fv(gl.getUniformLocation(this.shader.program, "filter5x5"), new Float32Array(uBlurFilter5x5));
 
 	this.bind = function ()
 	{
 		this.shader.bind()
 	}
 
+	this.update = function (menu)
+	{
+	    this.shader.uniforms.isBlurEnabled = menu.isBlurEnabled
+	}
+
 	this.updateBuffer = function ( sampler2D )
 	{
 	    this.gl.activeTexture(this.gl.TEXTURE1)
-		this.shader.uniforms.uBuffer = sampler2D
+		this.shader.uniforms.fbo = sampler2D
 	}
 
 	this.updateVideo = function ( sampler2D )
 	{
 	    this.gl.activeTexture(this.gl.TEXTURE6)
-		this.shader.uniforms.uVideo = sampler2D
+		this.shader.uniforms.video = sampler2D
 	}
+
+  	this.resize = function ()
+  	{
+	    this.shader.bind()  
+	    this.shader.uniforms.screenSize = [ settings.screen.width , settings.screen.height ]
+		gl.uniform2fv(gl.getUniformLocation(this.shader.program, "bufferSize" ), new Float32Array([ settings.fbo.width , settings.fbo.height ]))
+  	}
 
 	return this
 }

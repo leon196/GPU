@@ -66,6 +66,14 @@ shell.on('gl-init', function ()
     menu.buttonInteraction.innerHTML = menu.GetShaderInfo()
   })
 
+  menu.bufferSizeListElement.addEventListener('change', function()
+  {
+    settings.fbo = { width: menu.GetBufferSize(), height: menu.GetBufferSize() }
+    fboList = [ createFBO(gl, [settings.fbo.width, settings.fbo.height]), createFBO(gl, [settings.fbo.width, settings.fbo.height]) ]
+    glitchShader.resize()
+    simpleShader.resize()
+  })
+
   // Video Control
   menu.videoSlider.addEventListener('click', function (e)
   {
@@ -119,7 +127,7 @@ shell.on('tick', function()
     glitchShader.updatePicture( picture.texture.bind() )
     glitchShader.updateVideo( video.texture.bind() )
 
-    glitchShader.update( now() / 1000, menu.isInteractionEnabled, shell.mouseX, shell.mouseY )
+    glitchShader.update( now() / 1000, menu, shell.mouseX, shell.mouseY )
     
     glitchShader.updateTreshold( menu.optionTreshold )
     glitchShader.updateRGBOffset( menu.optionRGBOffset )
@@ -138,6 +146,7 @@ shell.on('gl-render', function (t)
 
     // Render contents of buffer to screen
     simpleShader.bind()
+    simpleShader.update( menu )
     simpleShader.updateVideo( video.texture.bind() )
     simpleShader.updateBuffer( fboList[current].color[0].bind() )
     fillScreen(gl)
