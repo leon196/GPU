@@ -63,9 +63,9 @@ exports.videoSlider = videoSlider
 var shaderList = 
 [ 
   { 
-    title: 'Fire Walk With Me'
+    title: 'Hahein'
     , infos: ''
-    , source: glslify(__dirname + '/../shaders/gallery/FireWalkWithMe.frag')
+    , source: glslify(__dirname + '/../shaders/gallery/Hahein.frag')
   }
   , { 
     title: 'Color Direction'
@@ -102,11 +102,11 @@ var shaderList =
     , infos: ''
     , source: glslify(__dirname + '/../shaders/gallery/Fire2.frag')
   }
-  // , { 
-  //   title: 'Hahein'
-  //   , infos: ''
-  //   , source: glslify(__dirname + '/../shaders/gallery/Hahein.frag')
-  // }
+  , { 
+    title: 'Fire Walk With Me'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/FireWalkWithMe.frag')
+  }
   // , { 
   //   title: 'Game Of Life'
   //   , infos: ''
@@ -209,8 +209,8 @@ var MenuOption = function ( id, optionName )
 // Shader Options
 exports.buttonClear = document.getElementById('buttonClear')
 exports.buttonBlur = document.getElementById('buttonBlur')
-exports.buttonBlur.innerHTML = 'Disable Blur'
-exports.isBlurEnabled = true;
+exports.buttonBlur.innerHTML = 'Enable Blur'
+exports.isBlurEnabled = false;
 exports.buttonBlur.addEventListener('click', function (e)
 {
   exports.isBlurEnabled = !exports.isBlurEnabled

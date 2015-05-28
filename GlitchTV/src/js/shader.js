@@ -145,11 +145,11 @@ exports.Simple = function ( gl )
 	gl.uniform2fv(gl.getUniformLocation(this.shader.program, "screenSize" ), new Float32Array([ settings.screen.width , settings.screen.height ]))
 
 	var uBlurFilter5x5 = [
-		0.0,0.05,0.05,0.05,0.0,
-		0.05,0.1,0.1,0.1,0.05, 
-		0.05,0.1,0.2,0.1,0.05, 
-		0.05,0.1,0.1,0.1,0.05, 
-		0.0,0.05,0.05,0.05,0.0];
+		0.0,0.0,0.0,0.0,0.0,
+		0.0,0.07,0.1,0.07,0.0, 
+		0.0,0.1,0.2,0.1,0.0, 
+		0.0,0.07,0.1,0.07,0.0, 
+		0.0,0.0,0.0,0.0,0.0];
 	gl.uniform1fv(gl.getUniformLocation(this.shader.program, "filter5x5"), new Float32Array(uBlurFilter5x5));
 
 	this.bind = function ()

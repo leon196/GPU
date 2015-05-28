@@ -1,7 +1,7 @@
 
-vec3 posterize ( vec3 color, float segments ) 
+vec4 posterize ( vec4 color, float segments ) 
 { 
-	return floor(color * segments) / segments; 
+	return vec4(floor(color.rgb * segments) / segments, 1.0); 
 }
 
 #pragma glslify: export(posterize)
