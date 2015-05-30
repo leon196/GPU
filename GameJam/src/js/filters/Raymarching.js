@@ -13,6 +13,12 @@ function Raymarching(fragmentSource)
 
             , uParameter1 : {type: "1f", value: 0}
             , uParameter2 : {type: "1f", value: 0}
+
+            , uEquationSelected : {type: "1f", value: 0}
+            , uEquationCount : {type: "1f", value: 0}
+
+            , uSceneSelected : {type: "1f", value: 0}
+            , uSceneCount : {type: "1f", value: 0}
         }
     );
 }

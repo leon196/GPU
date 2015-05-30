@@ -5,8 +5,10 @@ var Graphics = function()
 
     this.transparent = false;
 
-    this.Resize = function ()
+    this.Resize = function (width, height)
     {
+        width = width || Screen.size.width
+        height = height || Screen.size.height
 		this.clear();
         if (this.transparent)
         {
@@ -14,9 +16,9 @@ var Graphics = function()
         }
         else
         {
-            this.beginFill(0x330000);
+            this.beginFill(0x000000);
         }
-	    this.drawRect(0, 0, Screen.size.width, Screen.size.height);
+	    this.drawRect(0, 0, width, height);
 	    this.endFill();
     };
 
