@@ -26,8 +26,8 @@ void main( void )
 	vec2 uv = vTextureCoord;
 
 	// TV Offset Y
-	uv.y += mod(uTimeElapsed * 0.1, 1.0) * uParameterFadeOut;
-	uv = mod(uv, 1.0);
+	// uv.y += mod(uTimeElapsed * 0.1, 1.0) * uParameterFadeOut;
+	// uv = mod(uv, 1.0);
 
 	// Scanline
 	float random1 = rand(pixelize(uv - vec2(0, uTimeElapsed * 0.1), pow(2.0, 10.0)).yy);

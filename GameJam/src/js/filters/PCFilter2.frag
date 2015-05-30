@@ -29,7 +29,7 @@ void main( void )
 
 	// Leek
 	float y = uv.y + 0.1 * rand(uv.xx);
-	uv = mix(uv, mix(uv, vec2(uv.x, y), rand(uv.xx + pixelize(vec2(uTimeElapsed), 4.0))), uParameter2);
+	uv = mix(uv, mix(uv, vec2(uv.x, y), rand(uv.xx)), uParameter2);
 
     vec3 color = texture2D(uSampler, uv).rgb;
     

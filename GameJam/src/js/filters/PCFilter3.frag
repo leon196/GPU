@@ -56,7 +56,7 @@ void main( void )
 	float dist = length(center);
 
 	// Displacement from noise
-	vec2 uvAngle = pixelize(vec2(uTimeElapsed * 0.1, ratioAngle), 2048.0);
+	vec2 uvAngle = pixelize(vec2(0.0, ratioAngle), 2048.0);
 	float offset = rand(uvAngle) * radius + 0.2;
 
 	// Displaced pixel color
@@ -69,7 +69,7 @@ void main( void )
     vec3 color = texture2D(uSampler, uv).rgb;
 
     // Perlin 
-	uv += uParameter1 * noise(vec3(color) * 4.0 + vec3(0.1, 0.5, 1.0) * uTimeElapsed);
+	uv += uParameter1 * noise(vec3(color) * 4.0 + vec3(0.1, 0.5, 1.0));
 	uv = mod(uv, 1.0);
 
 	color = texture2D(uSampler, uv).rgb;

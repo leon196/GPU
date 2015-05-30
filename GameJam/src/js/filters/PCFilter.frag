@@ -28,7 +28,7 @@ void main( void )
     uv = mix(uv, vec2(rand(uv.xx)), uParameter2 * step(0.5, rand(uv.yy))); 
 
 	// Pixel Local 
-	vec2 target = vec2(cos(uTimeElapsed) * 0.5 + 0.5, sin(uTimeElapsed) * 0.125 + 0.5);
+	vec2 target = vec2(0.5);//vec2(cos(uTimeElapsed) * 0.5 + 0.5, sin(uTimeElapsed) * 0.125 + 0.5);
     float area = 16.0;
     float dist = distance(pixelize(uv, 16.0), target);
     dist += 0.25;
