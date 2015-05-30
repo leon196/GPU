@@ -1,4 +1,5 @@
 var glslify = require('glslify')
+var settings        = require('./settings')
 
 
 var menuContainerElement = document.getElementById('menu')
@@ -15,12 +16,12 @@ var videoList =
     , url: 'src/video/Depeche Mode - Enjoy The Silence (Low).mp4' 
   }
   , { 
-    title: 'Dance Ozlem Kahraman'
-    , url: 'src/video/Dance from ozlem kahraman from vimeo.mp4' 
-  }
-  , { 
     title: 'Iron'
     , url: 'src/video/Iron.webm' 
+  }
+  , { 
+    title: 'Dance Ozlem Kahraman'
+    , url: 'src/video/Dance from ozlem kahraman from vimeo.mp4' 
   }
   // , { 
   //   title: 'Vince Mcmahons'
@@ -62,6 +63,11 @@ exports.videoSlider = videoSlider
 var shaderList = 
 [ 
   { 
+    title: 'Hahein'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Hahein.frag')
+  }
+  , { 
     title: 'Color Direction'
     , infos: ''
     , source: glslify(__dirname + '/../shaders/gallery/Artefact3.frag')
@@ -95,6 +101,11 @@ var shaderList =
     title: 'Full Fire'
     , infos: ''
     , source: glslify(__dirname + '/../shaders/gallery/Fire2.frag')
+  }
+  , { 
+    title: 'Fire Walk With Me'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/FireWalkWithMe.frag')
   }
   // , { 
   //   title: 'Game Of Life'
@@ -197,6 +208,23 @@ var MenuOption = function ( id, optionName )
 
 // Shader Options
 exports.buttonClear = document.getElementById('buttonClear')
+exports.buttonBlur = document.getElementById('buttonBlur')
+exports.buttonBlur.innerHTML = 'Enable Blur'
+exports.isBlurEnabled = false;
+exports.buttonBlur.addEventListener('click', function (e)
+{
+  exports.isBlurEnabled = !exports.isBlurEnabled
+
+  if (exports.isBlurEnabled)
+  {
+    exports.buttonBlur.innerHTML = 'Disable Blur'
+  }
+  else
+  {
+    exports.buttonBlur.innerHTML = 'Enable Blur'
+  }
+})
+
 
 exports.optionTreshold = new MenuOption('Treshold', 'Manual Treshold')
 exports.optionRGBOffset = new MenuOption('RGB', 'RGB Offset')
@@ -212,3 +240,24 @@ exports.buttonPlay = buttonPlay
 // Video
 var buttonPause = document.getElementById('buttonPause')
 exports.buttonPause = buttonPause
+
+// Create Fbo Size
+var bufferSizeList = [ 128, 256, 512, 1024 ]
+var bufferSizeListElement = document.createElement('SELECT')
+for (var i = 0; i < bufferSizeList.length; ++i)
+{
+  var videoInfo = bufferSizeList[i]
+  var option = document.createElement('option')
+  option.text = videoInfo
+  bufferSizeListElement.options.add(option)
+  document.getElementById('menuBufferSize').appendChild(bufferSizeListElement)
+}
+
+exports.bufferSizeList = bufferSizeList
+exports.bufferSizeListElement = bufferSizeListElement
+exports.bufferSizeListElement.selectedIndex = bufferSizeList.indexOf(settings.fbo.width)
+
+exports.GetBufferSize = function ()
+{
+  return bufferSizeList[bufferSizeListElement.selectedIndex]
+}

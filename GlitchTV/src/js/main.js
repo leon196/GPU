@@ -5,6 +5,8 @@ var createFBO       = require('gl-fbo')
 var glslify         = require('glslify')
 var now             = require('right-now')
 var fillScreen      = require('a-big-triangle')
+var ndarray   = require("ndarray")
+var fill    = require("ndarray-fill")
 var shader          = require('./shader')
 var data            = require('./data')
 var color           = require('./color')
@@ -25,6 +27,7 @@ var glitchShader, simpleShader
 var fboList, current = 0
 var picture, video
 var shouldClearBuffer
+var isTicking = true
 
 shell.on('gl-init', function ()
 {
@@ -51,6 +54,7 @@ shell.on('gl-init', function ()
 
   // Keyboard
   shell.bind('restart', 'R')
+  shell.bind('nextTick', 'N')
 
   // Menu Video
   menu.videoListElement.addEventListener('change', function()
@@ -63,6 +67,14 @@ shell.on('gl-init', function ()
   {
     glitchShader.rebuild(menu.GetFragmentSource())
     menu.buttonInteraction.innerHTML = menu.GetShaderInfo()
+  })
+
+  menu.bufferSizeListElement.addEventListener('change', function()
+  {
+    settings.fbo = { width: menu.GetBufferSize(), height: menu.GetBufferSize() }
+    fboList = [ createFBO(gl, [settings.fbo.width, settings.fbo.height]), createFBO(gl, [settings.fbo.width, settings.fbo.height]) ]
+    glitchShader.resize()
+    simpleShader.resize()
   })
 
   // Video Control
@@ -96,34 +108,49 @@ shell.on('gl-init', function ()
   // 
   gl.disable(gl.DEPTH_TEST)
 })
+      
+      var hop = ndarray( 
+      new Uint8Array ( settings.fbo.width * settings.fbo.height * 4 )
+      , [ settings.fbo.width , settings.fbo.height , 4 ] )
+
+      fill( hop, function(x,y,c) 
+      {
+      if (c === 3) return 255
+      return Math.floor(Math.random() * 255)
+      })
 
 shell.on('tick', function() 
 {
   if (picture.isReady && video.isReady) 
   {
     var gl = shell.gl
-    var previousFbo = fboList[current]
-    var currentFbo = fboList[current ^= 1]
 
-    if(shouldClearBuffer || shell.wasDown('restart')) 
+    if (isTicking || shell.wasDown('nextTick'))
     {
-      shouldClearBuffer = false
-      previousFbo.color[0].setPixels( color.Black )
-    }
+      var previousFbo = fboList[current]
+      var currentFbo = fboList[current ^= 1]
 
-    currentFbo.bind()
-    glitchShader.bind()   
+      if(shouldClearBuffer || shell.wasDown('restart')) 
+      {
+        shouldClearBuffer = false
+        previousFbo.color[0].setPixels( color.Black )
+      } 
 
-    glitchShader.updateBuffer( previousFbo.color[0].bind() )
-    glitchShader.updatePicture( picture.texture.bind() )
-    glitchShader.updateVideo( video.texture.bind() )
+      currentFbo.bind()
+      glitchShader.bind()  
 
-    glitchShader.update( now() / 1000, menu.isInteractionEnabled, shell.mouseX, shell.mouseY )
-    
-    glitchShader.updateTreshold( menu.optionTreshold )
-    glitchShader.updateRGBOffset( menu.optionRGBOffset )
+
+      glitchShader.updateBuffer( previousFbo.color[0].bind() )
+      glitchShader.updatePicture( picture.texture.bind() )
+      glitchShader.updateVideo( video.texture.bind() )
+
+      glitchShader.update( now() / 1000, menu, shell.mouseX, shell.mouseY )
+      
+      glitchShader.updateTreshold( menu.optionTreshold )
+      glitchShader.updateRGBOffset( menu.optionRGBOffset )
 
     fillScreen( gl )
+    }
   }
 })
 
@@ -135,11 +162,12 @@ shell.on('gl-render', function (t)
   {
     video.update()
 
-    // Render contents of buffer to screen
-    simpleShader.bind()
-    simpleShader.updateVideo( video.texture.bind() )
-    simpleShader.updateBuffer( fboList[current].color[0].bind() )
-    fillScreen(gl)
+      // Render contents of buffer to screen
+      simpleShader.bind()
+      simpleShader.update( menu )
+      simpleShader.updateVideo( video.texture.bind() )
+      simpleShader.updateBuffer( fboList[current].color[0].bind() )
+      fillScreen(gl)
   }
   else
   {

@@ -14,7 +14,7 @@ var Graphics = function()
         }
         else
         {
-            this.beginFill(0x330000);
+            this.beginFill(0x000000);
         }
 	    this.drawRect(0, 0, Screen.size.width, Screen.size.height);
 	    this.endFill();
