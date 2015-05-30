@@ -14,11 +14,16 @@ var Scene = function()
     this.equationNameList = [
         'cos(x * (1.0 + 2.0 * mouse.x)) * 0.1'
         , '1.0 / (1.0 + exp(mouse.x * 2.0 * (x - 0.5)))'
+        , '(x * x + sin(3.0 * x)) * mouse.x'
+        , 'pow(1.0 + mouse.x, x - 1.0)'    
+        , 'x *= mouse.x; return x + x * cos(x);'
+        , '10.0 / (50.0 * sin(PI * (10.0 * mouse.x * x - 5.0) / 10.0) + 51.0)'
+        , ''
     ]
     this.textMargin = vec2(8, 8)
     for (var i = this.equationNameList.length - 1; i >= 0; --i) 
     {
-        var equation = new Equation(this.equationNameList[i], {font : '30px bitstream_vera_sans_monoroman', fill : '#ffffff', align : 'left'})
+        var equation = new Equation(this.equationNameList[i], {font : '20px bitstream_vera_sans_monoroman', fill : '#ffffff', align : 'left'})
         equation.x = this.textMargin.x
         equation.y = i * (equation.height + this.textMargin.y) + this.textMargin.y
         equation.index = i
@@ -36,8 +41,8 @@ var Scene = function()
     this.sceneList = []
     this.sceneNameList = [
         'spheres repeat'
-        , 'plane spheres'
-        , 'cube land'
+        , 'cubes ground'
+        , 'plane'
     ]
     for (var i = this.sceneNameList.length - 1; i >= 0; --i) 
     {

@@ -10,7 +10,7 @@ Engine.Setup = function ()
 {
     // Pixi
     Engine.renderer = new PIXI.WebGLRenderer(Screen.size.width, Screen.size.height, {  
-        resolution: 0.5
+        resolution: 1
         // , transparent: true
         // , clearBeforeRender: false
         // , preserveDrawingBuffer: true

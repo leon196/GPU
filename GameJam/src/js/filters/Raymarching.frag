@@ -18,13 +18,13 @@ uniform float uSceneSelected;
 uniform float uSceneCount;
 
 // Raymarching
-const float rayEpsilon = 0.001;
+const float rayEpsilon = 0.0001;
 const float rayMin = 0.1;
 const float rayMax = 10000.0;
-const int rayCount = 32;
+const int rayCount = 64;
 
 // Camera
-vec3 eye = vec3(0.0, 0.0, 0.0);
+vec3 eye = vec3(0.0, 0.0, -10.0);
 vec3 front = vec3(0.0, 0.0, 1.0);
 vec3 right = vec3(1.0, 0.0, 0.0);
 vec3 up = vec3(0.0, 1.0, 0.0);
@@ -96,6 +96,27 @@ float equation2 (float x, vec2 mouse)
     return 1.0 / (1.0 + exp(mouse.x * 2.0 * (x - 0.5)));
 }
 
+float equation3 (float x, vec2 mouse)
+{
+    return (x * x + sin(3.0 * x)) * mouse.x;
+}
+
+float equation4 (float x, vec2 mouse)
+{
+    return pow(1.0 + mouse.x, x - 1.0);
+}
+
+float equation5 (float x, vec2 mouse)
+{
+    x *= mouse.x;
+    return x + x * cos(x);
+}
+
+float equation6 (float x, vec2 mouse)
+{
+    return 10.0 / (50.0 * sin(PI * (10.0 * mouse.x * x) / 10.0) + 51.0);
+}
+
 float scene1 (vec3 p, float scale)
 {
     p = repeat(p, vec3(scale));
@@ -105,20 +126,18 @@ float scene1 (vec3 p, float scale)
 float scene2 (vec3 p, float scale)
 {
     float height = 2.0;
+    p = rotateX(p, -PI * 0.25);
     float d = plane(p, vec4(0.0, -1.0, 0.0, height));
     p.xz = mod(p.xz, scale) - scale * 0.5;
     p.y -= height / 2.0;
-    return min(d, sphere(p, scale * 0.2));
+    return min(d, box(p, vec3(scale * 0.2, 0.1 / scale, scale * 0.2)));
 }
 
 float scene3 (vec3 p, float scale)
 {
     float height = 2.0;
-    // p = rotateX(p, -PI * 0.1);
-    float d = plane(p, vec4(0.0, -1.0, 0.0, height));
-    p.xz = mod(p.xz, scale) - scale * 0.5;
-    p.y -= height / 2.0;
-    return min(d, box(p, vec3(scale * 0.1, scale, scale * 0.1)));
+    p = rotateX(p, -PI * 0.25);
+    return plane(p, vec4(0.0, -1.0, 0.0, -scale));
 }
 
 void main( void )
@@ -146,8 +165,12 @@ void main( void )
         float dist = length(ray * t);
         
         float scale = 0.0;
-        scale += equationSelection(1.0) * equation1(dist, mouse);
-        scale += equationSelection(2.0) * equation2(dist, mouse);
+        scale += equationSelection(1.0) * equation1(dist * 0.2, mouse);
+        scale += equationSelection(2.0) * equation2(dist * 0.2, mouse);
+        scale += equationSelection(3.0) * equation3(dist * 0.2, mouse);
+        scale += equationSelection(4.0) * equation4(dist * 0.2, mouse);
+        scale += equationSelection(5.0) * equation5(dist * 0.2, mouse);
+        scale += equationSelection(6.0) * equation6(dist * 0.2, mouse);
 
         float d = 0.0;
         d += sceneSelection(1.0) * scene1(p, scale);
@@ -161,7 +184,7 @@ void main( void )
 
             colorNormal += sceneSelection(1.0) * normalize(vec3(scene1(p+axisX, scale)-scene1(p-axisX, scale), scene1(p+axisY, scale)-scene1(p-axisY, scale), scene1(p+axisZ, scale)-scene1(p-axisZ, scale)));
             colorNormal += sceneSelection(2.0) * normalize(vec3(scene2(p+axisX, scale)-scene2(p-axisX, scale), scene2(p+axisY, scale)-scene2(p-axisY, scale), scene2(p+axisZ, scale)-scene2(p-axisZ, scale)));
-            colorNormal += sceneSelection(3.0) * normalize(vec3(scene3(p+axisX, scale)-scene3(p-axisX, scale), scene3(p+axisY, scale)-scene3(p-axisY, scale), scene3(p+axisZ, scale)-scene3(p-axisZ, scale)));
+            colorNormal += sceneSelection(3.0) * normalize(p);
 
             // Shadow from ray count
             color = (colorNormal * 0.5 + 0.5) * (1.0 - float(r) / float(rayCount));
@@ -176,15 +199,16 @@ void main( void )
         t += d;
     }
 
-    // color += 0.001 / abs(cos(vTextureCoord.x * 10.0) * 0.1 - vTextureCoord.y + 0.5); 
-
     vec2 eqUV = vec2(vTextureCoord.x, 1.0 - vTextureCoord.y) * 2.0 - 1.0;
     eqUV.x *= uResolution.x / uResolution.y;
     eqUV *= 4.0;
-    // eqUV.y *= -1.0;
     float eq = 0.0;
     eq += equationSelection(1.0) * (equation1(eqUV.x, mouse) - eqUV.y);
     eq += equationSelection(2.0) * (equation2(eqUV.x, mouse) - eqUV.y);
+    eq += equationSelection(3.0) * (equation3(eqUV.x, mouse) - eqUV.y);
+    eq += equationSelection(4.0) * (equation4(eqUV.x, mouse) - eqUV.y);
+    eq += equationSelection(5.0) * (equation5(eqUV.x, mouse) - eqUV.y);
+    eq += equationSelection(6.0) * (equation6(eqUV.x, mouse) - eqUV.y);
     color += max(0.0, 0.01 / abs(eq));
 
     gl_FragColor = vec4( color, 1.0 );
