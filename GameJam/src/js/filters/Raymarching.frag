@@ -24,7 +24,7 @@ const float rayMax = 10000.0;
 const int rayCount = 64;
 
 // Camera
-vec3 eye = vec3(0.0, 0.0, -10.0);
+vec3 eye = vec3(0.0, 0.0, -2.0);
 vec3 front = vec3(0.0, 0.0, 1.0);
 vec3 right = vec3(1.0, 0.0, 0.0);
 vec3 up = vec3(0.0, 1.0, 0.0);
@@ -76,14 +76,9 @@ vec3 rotateX(vec3 v, float t)
     return vec3(v.x, v.y * cost - v.z * sint, v.y * sint + v.z * cost);
 }
 
-float equationSelection (float equationIndex)
+float substraction( float d1, float d2 )
 {
-    return step(uEquationSelected / uEquationCount, (equationIndex - 1.0) / uEquationCount) - step((uEquationSelected + 1.0) / uEquationCount, (equationIndex - 1.0) / uEquationCount);
-}
-
-float sceneSelection (float sceneIndex)
-{
-    return step(uSceneSelected / uSceneCount, (sceneIndex - 1.0) / uSceneCount) - step((uSceneSelected + 1.0) / uSceneCount, (sceneIndex - 1.0) / uSceneCount);
+    return max(-d1,d2);
 }
 
 float equation1 (float x, vec2 mouse)
@@ -154,6 +149,11 @@ void main( void )
         // Ray Position
         vec3 p = eye + ray * t;
 
+        float sphereSub = sphere(p - eye, 1.0);
+
+        p = rotateY(p, mouse.x * 10.0);
+        p = rotateX(p, mouse.y * 10.0);
+
         // float scale = 1.0 + length(ray * t) * -mouse.x;
         float dist = length(ray * t);
 
@@ -168,9 +168,13 @@ void main( void )
         else if (uEquationSelected == 4.0) scale = equation5(value, mouse);
         else if (uEquationSelected == 5.0) scale = equation6(value, mouse);
 
+        //scale = 1.0;
+
         float d = 0.0;
         if (uSceneSelected == 0.0) d = scene1(p, scale);
         else if (uSceneSelected == 1.0) d = scene2(p, scale);
+
+        d = substraction(sphereSub, d);
 
         // Distance min or max reached
         if (d < rayEpsilon || t > rayMax)
