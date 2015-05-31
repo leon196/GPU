@@ -133,13 +133,6 @@ float scene2 (vec3 p, float scale)
     return min(d, box(p, vec3(scale * 0.2, 0.1 / scale, scale * 0.2)));
 }
 
-float scene3 (vec3 p, float scale)
-{
-    float height = 2.0;
-    p = rotateX(p, -PI * 0.25);
-    return plane(p, vec4(0.0, -1.0, 0.0, -scale));
-}
-
 void main( void )
 {
     // Pixel coordinate
@@ -152,8 +145,8 @@ void main( void )
     vec3 ray = normalize(front + right * uv.x + up * uv.y);
     
     // Initial color
-    vec3 color = skyColor;
-    
+    vec3 color = vec3(0.0);
+
     // Raymarching
     float t = 0.0;
     for (int r = 0; r < rayCount; ++r)
@@ -163,31 +156,32 @@ void main( void )
 
         // float scale = 1.0 + length(ray * t) * -mouse.x;
         float dist = length(ray * t);
+
+        float value = dist * 0.2;
+        if (uSceneSelected == 2.0) value = uv.x + uv.y;//dot(normalize(p), normalize(ray));
         
         float scale = 0.0;
-        scale += equationSelection(1.0) * equation1(dist * 0.2, mouse);
-        scale += equationSelection(2.0) * equation2(dist * 0.2, mouse);
-        scale += equationSelection(3.0) * equation3(dist * 0.2, mouse);
-        scale += equationSelection(4.0) * equation4(dist * 0.2, mouse);
-        scale += equationSelection(5.0) * equation5(dist * 0.2, mouse);
-        scale += equationSelection(6.0) * equation6(dist * 0.2, mouse);
+        if (uEquationSelected == 0.0) scale = equation1(value, mouse);
+        else if (uEquationSelected == 1.0) scale = equation2(value, mouse);
+        else if (uEquationSelected == 2.0) scale = equation3(value, mouse);
+        else if (uEquationSelected == 3.0) scale = equation4(value, mouse);
+        else if (uEquationSelected == 4.0) scale = equation5(value, mouse);
+        else if (uEquationSelected == 5.0) scale = equation6(value, mouse);
 
         float d = 0.0;
-        d += sceneSelection(1.0) * scene1(p, scale);
-        d += sceneSelection(2.0) * scene2(p, scale);
-        d += sceneSelection(3.0) * scene3(p, scale);
+        if (uSceneSelected == 0.0) d = scene1(p, scale);
+        else if (uSceneSelected == 1.0) d = scene2(p, scale);
 
         // Distance min or max reached
         if (d < rayEpsilon || t > rayMax)
         {
             vec3 colorNormal = vec3(0.0);
 
-            colorNormal += sceneSelection(1.0) * normalize(vec3(scene1(p+axisX, scale)-scene1(p-axisX, scale), scene1(p+axisY, scale)-scene1(p-axisY, scale), scene1(p+axisZ, scale)-scene1(p-axisZ, scale)));
-            colorNormal += sceneSelection(2.0) * normalize(vec3(scene2(p+axisX, scale)-scene2(p-axisX, scale), scene2(p+axisY, scale)-scene2(p-axisY, scale), scene2(p+axisZ, scale)-scene2(p-axisZ, scale)));
-            colorNormal += sceneSelection(3.0) * normalize(p);
+            if (uSceneSelected == 0.0) colorNormal = vec3(scene1(p+axisX, scale)-scene1(p-axisX, scale), scene1(p+axisY, scale)-scene1(p-axisY, scale), scene1(p+axisZ, scale)-scene1(p-axisZ, scale));
+            else if (uSceneSelected == 1.0) colorNormal = vec3(scene2(p+axisX, scale)-scene2(p-axisX, scale), scene2(p+axisY, scale)-scene2(p-axisY, scale), scene2(p+axisZ, scale)-scene2(p-axisZ, scale));
 
             // Shadow from ray count
-            color = (colorNormal * 0.5 + 0.5) * (1.0 - float(r) / float(rayCount));
+            color = (normalize(colorNormal) * 0.5 + 0.5) * (1.0 - float(r) / float(rayCount));
 
             // Sky color from distance
             color = mix(color, skyColor, smoothstep(rayMin, rayMax, t));
@@ -203,12 +197,12 @@ void main( void )
     eqUV.x *= uResolution.x / uResolution.y;
     eqUV *= 4.0;
     float eq = 0.0;
-    eq += equationSelection(1.0) * (equation1(eqUV.x, mouse) - eqUV.y);
-    eq += equationSelection(2.0) * (equation2(eqUV.x, mouse) - eqUV.y);
-    eq += equationSelection(3.0) * (equation3(eqUV.x, mouse) - eqUV.y);
-    eq += equationSelection(4.0) * (equation4(eqUV.x, mouse) - eqUV.y);
-    eq += equationSelection(5.0) * (equation5(eqUV.x, mouse) - eqUV.y);
-    eq += equationSelection(6.0) * (equation6(eqUV.x, mouse) - eqUV.y);
+    if (uEquationSelected == 0.0) eq = equation1(eqUV.x, mouse) - eqUV.y;
+    else if (uEquationSelected == 1.0) eq = equation2(eqUV.x, mouse) - eqUV.y;
+    else if (uEquationSelected == 2.0) eq = equation3(eqUV.x, mouse) - eqUV.y;
+    else if (uEquationSelected == 3.0) eq = equation4(eqUV.x, mouse) - eqUV.y;
+    else if (uEquationSelected == 4.0) eq = equation5(eqUV.x, mouse) - eqUV.y;
+    else if (uEquationSelected == 5.0) eq = equation6(eqUV.x, mouse) - eqUV.y;
     color += max(0.0, 0.01 / abs(eq));
 
     gl_FragColor = vec4( color, 1.0 );
