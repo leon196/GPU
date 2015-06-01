@@ -2,7 +2,7 @@
 // thank to @uint9 -> http://9bitscience.blogspot.fr/2013/07/raymarching-distance-fields_14.html
 // http://iquilezles.org/www/articles/distfunctions/distfunctions.htm
 
-precision mediump float;
+precision lowp float;
 
 #define PI 3.1416
 uniform vec2 uResolution;
@@ -16,15 +16,17 @@ uniform float uEquationSelected;
 uniform float uEquationCount;
 uniform float uSceneSelected;
 uniform float uSceneCount;
+uniform float uIsMoveSelected;
 
 // Raymarching
 const float rayEpsilon = 0.0001;
 const float rayMin = 0.1;
-const float rayMax = 10000.0;
+const float rayMax = 1000.0;
+const float rayStep = 2.0;
 const int rayCount = 64;
 
 // Camera
-vec3 eye = vec3(0.0, 0.0, -10.0);
+vec3 eye = vec3(0.0, 0.0, 0.0);
 vec3 front = vec3(0.0, 0.0, 1.0);
 vec3 right = vec3(1.0, 0.0, 0.0);
 vec3 up = vec3(0.0, 1.0, 0.0);
@@ -76,9 +78,19 @@ vec3 rotateX(vec3 v, float t)
     return vec3(v.x, v.y * cost - v.z * sint, v.y * sint + v.z * cost);
 }
 
+float addition( float d1, float d2 )
+{
+    return min(d1,d2);
+}
+
 float substraction( float d1, float d2 )
 {
     return max(-d1,d2);
+}
+
+float intersection( float d1, float d2 )
+{
+    return max(d1,d2);
 }
 
 float equation1 (float x)
@@ -143,6 +155,14 @@ float scene2 (vec3 p, float scale)
     return min(d, box(p, vec3(scale * 0.2, 0.1 / scale, scale * 0.2)));
 }
 
+// https://www.physicsforums.com/threads/cool-3-d-functions-for-graphing.140087/
+float scene3 (vec3 p, float scale)
+{
+    // return 1.0 / (p.x*p.x + p.z*p.z - p.y);
+    // return 1.0 / (p.x*p.z*p.z*p.z-p.z*p.x*p.x*p.x - p.y);
+    return cos(abs(p.x)+abs(p.z)) - p.y;
+}
+
 void main( void )
 {
     // Pixel coordinate
@@ -153,7 +173,9 @@ void main( void )
     mouse.y = 1.0 - mouse.y;
     // mouse = mouse * 2.0 - 1.0;
 
-        mouse.x += 0.5;
+    // front = normalize(-eye);
+    // up = cross(front, vec3(0.0, 1.0, 0.0));
+    // right = cross(front, up);
     
     // Ray from pixel
     vec3 ray = normalize(front + right * uv.x + up * uv.y);
@@ -168,10 +190,17 @@ void main( void )
         // Ray Position
         vec3 p = eye + ray * t;
 
-        // float sphereSub = sphere(p - eye, 1.0);
+        float sphereSub = sphere(p - eye, 0.1);
+
 
         // p = rotateY(p, mouse.x * 10.0);
         // p = rotateX(p, mouse.y * 10.0);
+
+        if (uIsMoveSelected > 0.0)
+        {
+            p = rotateX(p, -mouse.y * 10.0);
+            p = rotateY(p, mouse.x * 10.0);
+        }
 
         // float scale = 1.0 + length(ray * t) * -mouse.x;
 
@@ -179,25 +208,34 @@ void main( void )
         //float x = atan(uv.y, uv.x);
         float x = length(ray * t) * 0.2;
         
-        float scale = 0.2;
-        if (uEquationSelected == 0.0) scale = equation1(x / mouse.x)/* * mouse.y*/;
-        else if (uEquationSelected == 1.0) scale = equation2(x / mouse.x)/* * mouse.y*/;
-        else if (uEquationSelected == 2.0) scale = equation3(x / mouse.x)/* * mouse.y*/;
-        else if (uEquationSelected == 3.0) scale = equation4(x / mouse.x)/* * mouse.y*/;
-        else if (uEquationSelected == 4.0) scale = equation5(x / mouse.x)/* * mouse.y*/;
-        else if (uEquationSelected == 5.0) scale = equation6(x / mouse.x)/* * mouse.y*/;
+        float scale = 0.2;// + 2.0 * (cos(uTimeElapsed) * 0.5 + 0.5);
+        // if (uEquationSelected == 0.0) scale = equation1(x / mouse.x);
+        // else if (uEquationSelected == 1.0) scale = equation2(x / mouse.x);
+        // else if (uEquationSelected == 2.0) scale = equation3(x / mouse.x);
+        // else if (uEquationSelected == 3.0) scale = equation4(x / mouse.x);
+        // else if (uEquationSelected == 4.0) scale = equation5(x / mouse.x);
+        // else if (uEquationSelected == 5.0) scale = equation6(x / mouse.x);
 
         float d = 0.0;
         if (uSceneSelected == 0.0) d = scene1(p, scale);
         else if (uSceneSelected == 1.0) d = scene2(p, scale);
+        // d = scene3(p / 10.0, scale);
 
+        float boxInter = box(p, vec3(1.0));
+
+        float sphereD = d;
+
+        d = substraction(boxInter, d);
         // d = substraction(sphereSub, d);
+        // d = intersection(boxInter, d);
         // float d = sphere(p, 0.2);
 
         // Distance min or max reached
         if (d < rayEpsilon || t > rayMax)
         {
             vec3 colorNormal = normalize(displacement1(p, scale));//vec3(0.0);
+
+            if (boxInter < sphereD) colorNormal *= -1.0;
 
             // if (uSceneSelected == 0.0) colorNormal = vec3(scene1(p+axisX, scale)-scene1(p-axisX, scale), scene1(p+axisY, scale)-scene1(p-axisY, scale), scene1(p+axisZ, scale)-scene1(p-axisZ, scale));
             // else if (uSceneSelected == 1.0) colorNormal = vec3(scene2(p+axisX, scale)-scene2(p-axisX, scale), scene2(p+axisY, scale)-scene2(p-axisY, scale), scene2(p+axisZ, scale)-scene2(p-axisZ, scale));
@@ -213,18 +251,19 @@ void main( void )
 
         // Distance field step
         t += d;
+        // t += rayStep;
     }
 
     vec2 eqUV = vec2(vTextureCoord.x, 1.0 - vTextureCoord.y) * 2.0 - 1.0;
     eqUV.x *= uResolution.x / uResolution.y;
     eqUV *= 4.0;
     float eq = 0.0;
-    if (uEquationSelected == 0.0) eq = equation1(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
-    else if (uEquationSelected == 1.0) eq = equation2(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
-    else if (uEquationSelected == 2.0) eq = equation3(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
-    else if (uEquationSelected == 3.0) eq = equation4(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
-    else if (uEquationSelected == 4.0) eq = equation5(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
-    else if (uEquationSelected == 5.0) eq = equation6(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
+    if (uEquationSelected == 0.0) eq = equation1(eqUV.x / mouse.x) - eqUV.y;
+    else if (uEquationSelected == 1.0) eq = equation2(eqUV.x / mouse.x) - eqUV.y;
+    else if (uEquationSelected == 2.0) eq = equation3(eqUV.x / mouse.x) - eqUV.y;
+    else if (uEquationSelected == 3.0) eq = equation4(eqUV.x / mouse.x) - eqUV.y;
+    else if (uEquationSelected == 4.0) eq = equation5(eqUV.x / mouse.x) - eqUV.y;
+    else if (uEquationSelected == 5.0) eq = equation6(eqUV.x / mouse.x) - eqUV.y;
     color += max(0.0, 0.01 / abs(eq));
 
     gl_FragColor = vec4( color, 1.0 );

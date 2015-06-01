@@ -10,12 +10,12 @@ var Scene = function()
 
     this.textMargin = vec2(8, 8)
 
-    // Title
-    // this.title = new PIXI.Text("Raymarching with distorsion equations for Gamelier by Leon", {font : '30px bitstream_vera_sans_monoroman', fill : '#ffffff', align : 'center'})
-    // this.title.anchor.x = 0.5
-    // this.title.x = Screen.size.width / 2
-    // this.title.y = this.textMargin.y
-    // this.addChild(this.title)
+    // Buttons
+    this.moveButton = new TextButton('MOVE', {font : '20px bitstream_vera_sans_monoroman', fill : '#ffffff', align : 'left'})
+    this.moveButton.x = this.textMargin.x
+    this.moveButton.y = this.textMargin.y
+    this.moveButton.select()
+    this.addChild(this.moveButton)
 
     // Equaducation
     this.equationSelected = 0
@@ -48,8 +48,8 @@ var Scene = function()
     this.sceneSelected = 0
     this.sceneList = []
     this.sceneNameList = [
-        'spheres repeat'
-        , 'cubes ground'
+        'spheres'
+        // , 'cubes ground'
     ]
     for (var i = this.sceneNameList.length - 1; i >= 0; --i) 
     {
@@ -99,9 +99,6 @@ var Scene = function()
     this.Resize = function ()
     {
         this.background.Resize()
-
-
-        this.title.x = Screen.size.width / 2
 
         for (var i = this.equationList.length - 1; i >= 0; --i) 
         {

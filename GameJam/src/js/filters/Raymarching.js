@@ -19,6 +19,8 @@ function Raymarching(fragmentSource)
 
             , uSceneSelected : {type: "1f", value: 0}
             , uSceneCount : {type: "1f", value: 0}
+
+            , uIsMoveSelected : {type: "1f", value: 0}
         }
     );
 }
