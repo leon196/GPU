@@ -11,22 +11,22 @@ var Scene = function()
     this.textMargin = vec2(8, 8)
 
     // Title
-    this.title = new PIXI.Text("Raymarching with distorsion equations for Gamelier by Leon", {font : '30px bitstream_vera_sans_monoroman', fill : '#ffffff', align : 'center'})
-    this.title.anchor.x = 0.5
-    this.title.x = Screen.size.width / 2
-    this.title.y = this.textMargin.y
-    this.addChild(this.title)
+    // this.title = new PIXI.Text("Raymarching with distorsion equations for Gamelier by Leon", {font : '30px bitstream_vera_sans_monoroman', fill : '#ffffff', align : 'center'})
+    // this.title.anchor.x = 0.5
+    // this.title.x = Screen.size.width / 2
+    // this.title.y = this.textMargin.y
+    // this.addChild(this.title)
 
     // Equaducation
     this.equationSelected = 0
     this.equationList = []
     this.equationNameList = [
-        'cos(x * (1.0 + 2.0 * mouse.x)) * 0.1'
-        , '1.0 / (1.0 + exp(mouse.x * 2.0 * (x - 0.5)))'
-        , '(x * x + sin(3.0 * x)) * mouse.x'
-        , 'pow(1.0 + mouse.x, x - 1.0)'    
-        , 'x *= mouse.x; return x + x * cos(x);'
-        , '10.0 / (50.0 * sin(PI * (10.0 * mouse.x * x - 5.0) / 10.0) + 51.0)'
+        'cos(x * (1.0 + 2.0)) * 0.1'
+        , '1.0 / (1.0 + exp(2.0 * (x - 0.5)))'
+        , '(x * x + sin(3.0 * x)) * 0.2'
+        , 'pow(0.25, x - 1.0)'    
+        , '1.0 + x + x * cos(x);'
+        , '10.0 / (50.0 * sin(PI * (10.0 * x) / 10.0) + 51.0)'
     ]
     for (var i = this.equationNameList.length - 1; i >= 0; --i) 
     {

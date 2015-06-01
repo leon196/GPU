@@ -93,12 +93,12 @@ float equation2 (float x)
 
 float equation3 (float x)
 {
-    return 0.1 + (x * x + sin(3.0 * x));
+    return (x * x + sin(3.0 * x)) * 0.2;
 }
 
 float equation4 (float x)
 {
-    return pow(1.0, x - 1.0);
+    return pow(0.25, x - 1.0);
 }
 
 float equation5 (float x)
@@ -111,20 +111,35 @@ float equation6 (float x)
     return 10.0 / (50.0 * sin(PI * (10.0 * x) / 10.0) + 51.0);
 }
 
+vec3 displacement1 (vec3 p, float scale)
+{
+    return repeat(p, vec3(scale));
+}
+
+vec3 displacement2a (vec3 p)
+{
+    return rotateX(p, -PI * 0.25);
+}
+
+vec3 displacement2b (vec3 p, float scale, float height)
+{
+    p.xz = mod(p.xz, scale) - scale * 0.5;
+    p.y -= height / 2.0;
+    return p;
+}
+
+
 float scene1 (vec3 p, float scale)
 {
-    scale = floor(scale * 100.0) / 100.0;
-    p = repeat(p, vec3(scale));
-    return sphere(p, scale * 0.2);
+    return sphere(displacement1(p, scale), scale * 0.2);
 }
 
 float scene2 (vec3 p, float scale)
 {
     float height = 2.0;
-    p = rotateX(p, -PI * 0.25);
+    p = displacement2a(p);
     float d = plane(p, vec4(0.0, -1.0, 0.0, height));
-    p.xz = mod(p.xz, scale) - scale * 0.5;
-    p.y -= height / 2.0;
+    p = displacement2b(p, scale, height);
     return min(d, box(p, vec3(scale * 0.2, 0.1 / scale, scale * 0.2)));
 }
 
@@ -137,6 +152,8 @@ void main( void )
     vec2 mouse = uMouse / uResolution;
     mouse.y = 1.0 - mouse.y;
     // mouse = mouse * 2.0 - 1.0;
+
+        mouse.x += 0.5;
     
     // Ray from pixel
     vec3 ray = normalize(front + right * uv.x + up * uv.y);
@@ -158,34 +175,35 @@ void main( void )
 
         // float scale = 1.0 + length(ray * t) * -mouse.x;
 
-        // float value = p.z;
-        //float value = atan(uv.y, uv.x);
-        float value = length(ray * t) * 0.2;
+        // float x = p.z;
+        //float x = atan(uv.y, uv.x);
+        float x = length(ray * t) * 0.2;
         
-        float scale = 0.0;
-        if (uEquationSelected == 0.0) scale = equation1(value / mouse.x) * mouse.y;
-        else if (uEquationSelected == 1.0) scale = equation2(value / mouse.x) * mouse.y;
-        else if (uEquationSelected == 2.0) scale = equation3(value / mouse.x) * mouse.y;
-        else if (uEquationSelected == 3.0) scale = equation4(value / mouse.x) * mouse.y;
-        else if (uEquationSelected == 4.0) scale = equation5(value / mouse.x) * mouse.y;
-        else if (uEquationSelected == 5.0) scale = equation6(value / mouse.x) * mouse.y;
+        float scale = 0.2;
+        if (uEquationSelected == 0.0) scale = equation1(x / mouse.x)/* * mouse.y*/;
+        else if (uEquationSelected == 1.0) scale = equation2(x / mouse.x)/* * mouse.y*/;
+        else if (uEquationSelected == 2.0) scale = equation3(x / mouse.x)/* * mouse.y*/;
+        else if (uEquationSelected == 3.0) scale = equation4(x / mouse.x)/* * mouse.y*/;
+        else if (uEquationSelected == 4.0) scale = equation5(x / mouse.x)/* * mouse.y*/;
+        else if (uEquationSelected == 5.0) scale = equation6(x / mouse.x)/* * mouse.y*/;
 
         float d = 0.0;
         if (uSceneSelected == 0.0) d = scene1(p, scale);
         else if (uSceneSelected == 1.0) d = scene2(p, scale);
 
         // d = substraction(sphereSub, d);
+        // float d = sphere(p, 0.2);
 
         // Distance min or max reached
         if (d < rayEpsilon || t > rayMax)
         {
-            vec3 colorNormal = vec3(0.0);
+            vec3 colorNormal = normalize(displacement1(p, scale));//vec3(0.0);
 
-            if (uSceneSelected == 0.0) colorNormal = vec3(scene1(p+axisX, scale)-scene1(p-axisX, scale), scene1(p+axisY, scale)-scene1(p-axisY, scale), scene1(p+axisZ, scale)-scene1(p-axisZ, scale));
-            else if (uSceneSelected == 1.0) colorNormal = vec3(scene2(p+axisX, scale)-scene2(p-axisX, scale), scene2(p+axisY, scale)-scene2(p-axisY, scale), scene2(p+axisZ, scale)-scene2(p-axisZ, scale));
+            // if (uSceneSelected == 0.0) colorNormal = vec3(scene1(p+axisX, scale)-scene1(p-axisX, scale), scene1(p+axisY, scale)-scene1(p-axisY, scale), scene1(p+axisZ, scale)-scene1(p-axisZ, scale));
+            // else if (uSceneSelected == 1.0) colorNormal = vec3(scene2(p+axisX, scale)-scene2(p-axisX, scale), scene2(p+axisY, scale)-scene2(p-axisY, scale), scene2(p+axisZ, scale)-scene2(p-axisZ, scale));
 
             // Shadow from ray count
-            color = (normalize(colorNormal) * 0.5 + 0.5) * (1.0 - float(r) / float(rayCount));
+            color = (colorNormal * 0.5 + 0.5) * (1.0 - float(r) / float(rayCount));
 
             // Sky color from distance
             color = mix(color, skyColor, smoothstep(rayMin, rayMax, t));
@@ -201,12 +219,12 @@ void main( void )
     eqUV.x *= uResolution.x / uResolution.y;
     eqUV *= 4.0;
     float eq = 0.0;
-    if (uEquationSelected == 0.0) eq = equation1(eqUV.x / mouse.x) * mouse.y - eqUV.y;
-    else if (uEquationSelected == 1.0) eq = equation2(eqUV.x / mouse.x) * mouse.y - eqUV.y;
-    else if (uEquationSelected == 2.0) eq = equation3(eqUV.x / mouse.x) * mouse.y - eqUV.y;
-    else if (uEquationSelected == 3.0) eq = equation4(eqUV.x / mouse.x) * mouse.y - eqUV.y;
-    else if (uEquationSelected == 4.0) eq = equation5(eqUV.x / mouse.x) * mouse.y - eqUV.y;
-    else if (uEquationSelected == 5.0) eq = equation6(eqUV.x / mouse.x) * mouse.y - eqUV.y;
+    if (uEquationSelected == 0.0) eq = equation1(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
+    else if (uEquationSelected == 1.0) eq = equation2(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
+    else if (uEquationSelected == 2.0) eq = equation3(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
+    else if (uEquationSelected == 3.0) eq = equation4(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
+    else if (uEquationSelected == 4.0) eq = equation5(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
+    else if (uEquationSelected == 5.0) eq = equation6(eqUV.x / mouse.x)/* * mouse.y*/ - eqUV.y;
     color += max(0.0, 0.01 / abs(eq));
 
     gl_FragColor = vec4( color, 1.0 );
