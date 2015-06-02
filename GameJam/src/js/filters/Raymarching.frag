@@ -21,12 +21,12 @@ uniform float uIsMoveSelected;
 // Raymarching
 const float rayEpsilon = 0.0001;
 const float rayMin = 0.1;
-const float rayMax = 1000.0;
+const float rayMax = 10000.0;
 const float rayStep = 2.0;
 const int rayCount = 64;
 
 // Camera
-vec3 eye = vec3(0.0, 0.0, 0.0);
+vec3 eye = vec3(0.0, 0.0, -0.1);
 vec3 front = vec3(0.0, 0.0, 1.0);
 vec3 right = vec3(1.0, 0.0, 0.0);
 vec3 up = vec3(0.0, 1.0, 0.0);
@@ -50,9 +50,16 @@ float sphere ( vec3 p, float s )
     return length(p)-s; 
 }
 
-float box( vec3 p, vec3 b )
+float udBox( vec3 p, vec3 b )
 {
   return length(max(abs(p)-b,0.0));
+}
+
+float box( vec3 p, vec3 b )
+{
+  vec3 d = abs(p) - b;
+  return min(max(d.x,max(d.y,d.z)),0.0) +
+         length(max(d,0.0));
 }
 
 float plane( vec3 p, vec4 n )
@@ -125,7 +132,9 @@ float equation6 (float x)
 
 vec3 displacement1 (vec3 p, float scale)
 {
-    return repeat(p, vec3(scale));
+    p = repeat(p, vec3(scale));
+    p *= cos(length(p) * 10.0);
+    return p;
 }
 
 vec3 displacement2a (vec3 p)
@@ -143,7 +152,7 @@ vec3 displacement2b (vec3 p, float scale, float height)
 
 float scene1 (vec3 p, float scale)
 {
-    return sphere(displacement1(p, scale), scale * 0.2);
+    return sphere(displacement1(p, scale), scale * 0.333);
 }
 
 float scene2 (vec3 p, float scale)
@@ -190,25 +199,21 @@ void main( void )
         // Ray Position
         vec3 p = eye + ray * t;
 
-        float sphereSub = sphere(p - eye, 0.1);
+        float sphereSub = sphere(p - eye, 0.003);
+        float sphereSubSub = sphere(p - eye, 0.0031);
 
+        float boxInter = box(p - eye, vec3(0.005));
 
         // p = rotateY(p, mouse.x * 10.0);
         // p = rotateX(p, mouse.y * 10.0);
 
-        if (uIsMoveSelected > 0.0)
-        {
-            p = rotateX(p, -mouse.y * 10.0);
-            p = rotateY(p, mouse.x * 10.0);
-        }
-
         // float scale = 1.0 + length(ray * t) * -mouse.x;
 
         // float x = p.z;
-        //float x = atan(uv.y, uv.x);
-        float x = length(ray * t) * 0.2;
+        // float x = atan(uv.y, uv.x);
+        float x = length(p);//length(ray * t) * 0.2;
         
-        float scale = 0.2;// + 2.0 * (cos(uTimeElapsed) * 0.5 + 0.5);
+        float scale = 0.1 + length(p);// + 2.0 * (cos(uTimeElapsed) * 0.5 + 0.5);
         // if (uEquationSelected == 0.0) scale = equation1(x / mouse.x);
         // else if (uEquationSelected == 1.0) scale = equation2(x / mouse.x);
         // else if (uEquationSelected == 2.0) scale = equation3(x / mouse.x);
@@ -216,17 +221,24 @@ void main( void )
         // else if (uEquationSelected == 4.0) scale = equation5(x / mouse.x);
         // else if (uEquationSelected == 5.0) scale = equation6(x / mouse.x);
 
-        float d = 0.0;
-        if (uSceneSelected == 0.0) d = scene1(p, scale);
-        else if (uSceneSelected == 1.0) d = scene2(p, scale);
+        scale = x * 0.1;//log(x * 0.01 + 0.005) * 8.0 / 3.0 + 8.0;
+
+        if (uIsMoveSelected > 0.0)
+        {
+            p = rotateX(p, -mouse.y * 4.0);
+            p = rotateY(p, mouse.x * 4.0);
+        }
+
+
+        float d = scene1(p, scale);
+        // if (uSceneSelected == 0.0) d = scene1(p, scale);
+        // else if (uSceneSelected == 1.0) d = scene2(p, scale);
         // d = scene3(p / 10.0, scale);
 
-        float boxInter = box(p, vec3(1.0));
+        // float sphereD = d;
 
-        float sphereD = d;
-
-        d = substraction(boxInter, d);
-        // d = substraction(sphereSub, d);
+        // d = substraction(boxInter, d);
+        d = substraction(sphereSub, d);
         // d = intersection(boxInter, d);
         // float d = sphere(p, 0.2);
 
@@ -235,7 +247,7 @@ void main( void )
         {
             vec3 colorNormal = normalize(displacement1(p, scale));//vec3(0.0);
 
-            if (boxInter < sphereD) colorNormal *= -1.0;
+            if (sphereSubSub <= d) colorNormal *= -1.0;
 
             // if (uSceneSelected == 0.0) colorNormal = vec3(scene1(p+axisX, scale)-scene1(p-axisX, scale), scene1(p+axisY, scale)-scene1(p-axisY, scale), scene1(p+axisZ, scale)-scene1(p-axisZ, scale));
             // else if (uSceneSelected == 1.0) colorNormal = vec3(scene2(p+axisX, scale)-scene2(p-axisX, scale), scene2(p+axisY, scale)-scene2(p-axisY, scale), scene2(p+axisZ, scale)-scene2(p-axisZ, scale));
