@@ -13,7 +13,7 @@ var videoList =
 [ 
   { 
     title: 'Depeche Mode'
-    , url: 'src/video/Depeche Mode - Enjoy The Silence (Low).mp4' 
+    , url: 'src/video/DepecheMode.mp4' 
   }
   , { 
     title: 'Iron'
@@ -21,7 +21,7 @@ var videoList =
   }
   , { 
     title: 'Dance Ozlem Kahraman'
-    , url: 'src/video/Dance from ozlem kahraman from vimeo.mp4' 
+    , url: 'src/video/DanceOzlemKahraman.mp4' 
   }
   // , { 
   //   title: 'Vince Mcmahons'
