@@ -19,6 +19,7 @@
     "gl-now": "^1.4.0",
     "gl-shader": "^4.0.0",
     "gl-texture2d": "^2.0.8",
+    "glsl-fast-gaussian-blur": "^1.0.2",
     "glsl-hsl2rgb": "^1.1.0",
     "glsl-luma": "^1.0.1",
     "glsl-random": "0.0.5",

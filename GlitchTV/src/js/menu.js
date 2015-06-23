@@ -12,8 +12,8 @@ exports.menuContainerElement = menuContainerElement
 var videoList = 
 [ 
   { 
-    title: 'Depeche Mode'
-    , url: 'src/video/DepecheMode.mp4' 
+    title: 'VH1 Classic'
+    , url: 'src/video/vh1.ogv' 
   }
   , { 
     title: 'Iron'
@@ -24,12 +24,12 @@ var videoList =
     , url: 'src/video/DanceOzlemKahraman.mp4' 
   }
   // , { 
-  //   title: 'Vince Mcmahons'
-  //   , url: 'src/video/vince.ogv' 
+  //   title: 'Rock'
+  //   , url: 'src/video/Rock.mp4' 
   // }
   , { 
-    title: 'VH1 Classic'
-    , url: 'src/video/vh1.ogv' 
+    title: 'Depeche Mode'
+    , url: 'src/video/DepecheMode.mp4' 
   }
 ]
 
@@ -63,9 +63,14 @@ exports.videoSlider = videoSlider
 var shaderList = 
 [ 
   { 
-    title: 'Hahein'
+    title: 'Planet'
     , infos: ''
-    , source: glslify(__dirname + '/../shaders/gallery/Hahein.frag')
+    , source: glslify(__dirname + '/../shaders/gallery/Planet.frag')
+  }
+  , { 
+    title: 'Hop'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Hop.frag')
   }
   , { 
     title: 'Color Direction'
@@ -106,6 +111,11 @@ var shaderList =
     title: 'Fire Walk With Me'
     , infos: ''
     , source: glslify(__dirname + '/../shaders/gallery/FireWalkWithMe.frag')
+  }
+  , { 
+    title: 'Hahein'
+    , infos: ''
+    , source: glslify(__dirname + '/../shaders/gallery/Hahein.frag')
   }
   // , { 
   //   title: 'Game Of Life'

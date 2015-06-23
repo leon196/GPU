@@ -167,6 +167,13 @@ shell.on('gl-render', function (t)
       simpleShader.update( menu )
       simpleShader.updateVideo( video.texture.bind() )
       simpleShader.updateBuffer( fboList[current].color[0].bind() )
+      // glitchShader.bind()  
+      // glitchShader.updatePicture( picture.texture.bind() )
+      // glitchShader.updateVideo( video.texture.bind() )
+      // glitchShader.update( now() / 1000, menu, shell.mouseX, shell.mouseY )
+      // glitchShader.updateTreshold( menu.optionTreshold )
+      // glitchShader.updateRGBOffset( menu.optionRGBOffset )
+
       fillScreen(gl)
   }
   else
