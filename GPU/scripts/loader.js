@@ -1,43 +1,27 @@
 
-let textures = {};
-let textureLoader = new THREE.TextureLoader();
-let textureLoaded = 0;
-let textureUrls = [
-	{ name:'cursor', url:'images/cursor.png' },
-];
-let textureCount = textureUrls.length;
+var assets = {};
+var assetsLoaded = 0;
+var assetCount;
 
-let shaders = {};
-let shaderLoader = new THREE.FileLoader();
-let shaderLoaded = 0;
-let shaderUrls = [
-	{ name:'title.vert', url:'shaders/title.vert' },
-	{ name:'title.frag', url:'shaders/title.frag' },
-];
-let shaderCount = shaderUrls.length;
+var textureLoader = new THREE.TextureLoader();
+var shaderLoader = new THREE.FileLoader();
+var audioLoader = new THREE.AudioLoader();
 
 var callbackOnLoad = null;
 
-function loadedTexture (key, data) {
-	textures[key] = data;
-	if (Object.keys(textures).length == textureCount && Object.keys(shaders).length == shaderCount) {
+function loaded (key, data) {
+	assets[key] = data;
+	if (Object.keys(assets).length == assetCount) {
 		if (callbackOnLoad != null) {
 			callbackOnLoad();
 		}
 	}
 }
 
-function loadedShader (key, data) {
-	shaders[key] = data;
-	if (Object.keys(textures).length == textureCount && Object.keys(shaders).length == shaderCount) {
-		if (callbackOnLoad != null) {
-			callbackOnLoad();
-		}
-	}
-}
-
-function load (callback) {
+function load (textureUrls, shaderUrls, audioUrls, callback) {
 	callbackOnLoad = callback;
-	textureUrls.forEach(item => { textureLoader.load(item.url, data => loadedTexture(item.name, data)); });
-	shaderUrls.forEach(item => { shaderLoader.load(item.url, data => loadedShader(item.name, data)); });
+	assetCount = textureUrls.length + shaderUrls.length + audioUrls.length;
+	textureUrls.forEach(item => { textureLoader.load(item.url, data => loaded(item.name, data)); });
+	shaderUrls.forEach(item => { shaderLoader.load(item.url, data => loaded(item.name, data)); });
+	audioUrls.forEach(item => { audioLoader.load(item.url, data => loaded(item.name, data)); });
 }

@@ -1,27 +1,24 @@
 
-
-function lerp(v0, v1, t) { return v0*(1-t)+v1*t; } 
-function closestPowerOfTwo (num) { return Math.pow(2, Math.ceil(Math.log(num) / Math.log(2))); } 
-function distanceFrom (a, b) { return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)); } 
-function distNoSqrt (a, b) { return ((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)); } 
-function vectorFrom (a,b) {
-  return [(b.x-a.x), (b.y-a.y)];
-}
-function directionFrom (a,b) {
-  var len = Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
-  return [(b.x-a.x)/len, (b.y-a.y)/len];
-}
-function shuffle (array) { for (var i = array.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var temp = array[i]; array[i] = array[j]; array[j] = temp; } return array; }
-function smoothstep (edge0, edge1, x) { var t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0))); return t * t * (3 - 2 * t); }
-var defaultUV = [0, 1, 1, 1, 0, 0, 1, 0];
-
-
 window.onload = function () {
 
-  var renderer, scene, camera, screen, mouse, player, agents, colliders;
-  const screenRangeNoSqrt = 64;
+  var renderer, scene, sceneStart, sceneTransition, camera, uniforms, state, frame, point, timer, round, listener, music, audio;
 
-  load(start);
+  load([
+    { name:'cursor', url:'images/cursor.png' },
+  ],[
+    { name:'fullscreen', url:'shaders/fullscreen.vert' },
+    { name:'text', url:'shaders/text.frag' },
+    { name:'glitch-1', url:'shaders/glitch-1.frag' },
+    { name:'glitch-2', url:'shaders/glitch-2.frag' },
+    { name:'glitch-3', url:'shaders/glitch-3.frag' },
+    { name:'transition', url:'shaders/transition.frag' },
+    { name:'transition-buffer', url:'shaders/transition-buffer.frag' },
+  ],[
+    { name:'intro_loop', url:'sounds/intro_loop.mp3' },
+    { name:'intro_titre', url:'sounds/intro_titre.mp3' },
+    { name:'loop_mystere', url:'sounds/loop_mystere.mp3' },
+    { name:'sfx_win', url:'sounds/sfx_win.mp3' },
+  ], start);
 
   function start () {
 
@@ -29,226 +26,287 @@ window.onload = function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 100);
+
+    listener = new THREE.AudioListener();
+    camera.add(listener);
+    music = new THREE.Audio(listener);
+    audio = new THREE.Audio(listener);
+    music.setBuffer(assets['intro_titre']);
+    music.setLoop(true);
+    music.play();
+    audio.setBuffer(assets['sfx_win']);
+
     camera.position.z = 5;
 
-    mouse = { x: 0, y: 0, clic: false };
+    uniforms = {
+      uTime: { value: 0 },
+      uResolution: { value: 0 },
+      uVideo: { value: 0 },
+      uText: { value: 0 },
+      uTextMask: { value: 0 },
+      uTextWin: { value: 0 },
+      uHover: { value: 0 },
+      uCursor: { value: 0 },
+      uTransition: { value: 0 },
+      uFrame: { value: 0 },
+      uGameOver: { value: 0 },
+    }
 
-    agents = [];
-    addAgent(50);
+    sceneStart = new THREE.Scene();
+    sceneTransition = new THREE.Scene();
 
-    player = new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(1,1),
-      new THREE.MeshBasicMaterial({
-        map: textures['cursor'],
-        transparent: true,
-      }));
-    updateFrame(player, [1,4], [0,1]);
-    scene.add(player);
+    add('fullscreen', 'text', new THREE.PlaneGeometry(1,1), sceneStart);
+    add('fullscreen', 'transition', new THREE.PlaneGeometry(1,1), sceneTransition);
 
-    colliders = [];
-    addColliders(2);
+    scene = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.ShaderMaterial({
+      vertexShader: assets['fullscreen'],
+      fragmentShader: assets['glitch-1'],
+    }));
+    scene.material.uniforms = uniforms;
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mousedown', onMouseDown);
-    document.addEventListener('mouseup', onMouseUp);
-    document.addEventListener('touchmove', onTouchMove, {passive: false});
-    document.addEventListener('touchstart', onTouchDown, {passive: false});
-    document.addEventListener('touchend', onTouchUp, {passive: false});
-    window.addEventListener('resize', resize, false);
+    var video = document.createElement('video');
+    video.src = 'videos/talking-heads.mp4';
+    video.muted = true;
+    video.autoplay = true;
+    video.loop = true;
+    video.currentTime = 10.;
+    document.body.appendChild(video);
+
+    uniforms.uVideo.value = new THREE.VideoTexture(video);
+    uniforms.uVideo.value.minFilter = THREE.NearestFilter;
+    uniforms.uVideo.value.magFilter = THREE.NearestFilter;
+
+    var options = {
+      material: new THREE.ShaderMaterial({
+        vertexShader: assets['fullscreen'],
+        fragmentShader: assets['transition-buffer'],
+      }),
+      min: THREE.NearestFilter,
+      mag: THREE.NearestFilter,
+    }
+    options.material.uniforms = uniforms;
+    frame = new FrameBuffer(options);
+
+    point = [Math.random(), Math.random()];
+    point = [.5, .5];
+    uniforms.uCursor.value = [
+      Math.abs(point[0]-mouse.x/window.innerWidth),
+      Math.abs(point[1]-mouse.y/window.innerHeight)
+    ];
+
+    state = 0;
+    round = 1;
+    timer = 0;
+    updateGlitch();
 
     resize();
+    window.addEventListener('resize', resize, false);
     requestAnimationFrame( update );
+  }
+
+  function add (vert, frag, geo, scn) {
+    var geometry = geo || new THREE.PlaneGeometry(1,1);
+    var material = new THREE.ShaderMaterial({
+      vertexShader: assets[vert],
+      fragmentShader: assets[frag],
+    });
+    material.uniforms = uniforms;
+    scn = scn || scene;
+    scn.add(new THREE.Mesh(geometry, material));
   }
 
   function update (elapsed) {
     requestAnimationFrame( update );
 
     elapsed /= 1000;
+    uniforms.uTime.value = elapsed;
 
-    var offset = new THREE.Vector3();
-    var dir, dist, otherAgent;
+    if (state == 0) {
 
-    // player control
-    if (mouse.clic) {
-      dir = vectorFrom(mouse, screen.center);
-      dist = distNoSqrt(mouse, screen.center);
-      dist = smoothstep(0., screen.height, dist);
-
-      // colliders
-      for (var index = 0; index < colliders.length; ++index) {
-        var collider = colliders[index];
-        var scale = collider.scale;
-
-        // recycle with teleporting
-        var ds = distNoSqrt(collider.position, player.position);
-        var dr = vectorFrom(player.position, collider.position);
-        if (ds > screenRangeNoSqrt) {
-          collider.position.x = player.position.x - dr[0] * .95;
-          collider.position.y = player.position.y - dr[1] * .95;
+      if (Math.abs(mouse.x - window.innerWidth / 2) - window.innerWidth / 10 < 0
+        && Math.abs(mouse.y - window.innerHeight + window.innerHeight / 4) - window.innerHeight / 10 < 0) {
+        uniforms.uHover.value = lerp(uniforms.uHover.value, 1, .1);
+        document.body.style.cursor = 'pointer';
+        if (mouse.clic) {
+          state = 1000;
+          timer = elapsed;
+          document.body.style.cursor = 'default';
+          audio.play();
+          music.stop();
+          music.setBuffer(assets['intro_loop']);
+          music.setLoop(false);
+          music.play();
+          music.source.onended = function() {
+            music.stop();
+            music.setBuffer(assets['loop_mystere']);
+            music.setLoop(true);
+            music.play();
+            music.source.onended = null;            
+          }
         }
-
-        // collision
-        var insideRectangle = Math.abs(player.position.x - collider.position.x) < (scale.x+player.scale.x)/2 && Math.abs(player.position.y - collider.position.y) < (scale.y+player.scale.y)/2;
-        if (insideRectangle) {
-          if (player.position.x < collider.position.x-scale.x/2) dir[0] = Math.max(dir[0], 0);
-          else if (player.position.x > collider.position.x+scale.x/2) dir[0] = Math.min(dir[0], 0);
-          else if (player.position.y < collider.position.y-scale.y/2) dir[1] = Math.min(dir[1], 0);
-          else if (player.position.y > collider.position.y+scale.y/2) dir[1] = Math.max(dir[1], 0);
-        }
+      } else {
+        uniforms.uHover.value *= .9;
+        document.body.style.cursor = 'default';
       }
-
-      // move player
-      player.position.x += -dir[0] * .0005 * dist;
-      player.position.y += dir[1] * .0005 * dist;
-      camera.position.x = player.position.x;
-      camera.position.y = player.position.y;
-    }
-
-    for (var index = 0; index < agents.length; ++index) {
-      var agent = agents[index];
-      offset.set(0,0,0);
-
-      // goto target
-      dist = distNoSqrt(agent.position, agent.target);
-      dir = vectorFrom(agent.position, agent.target);
-      offset.x += dir[0]*dist * .05;
-      offset.y += dir[1]*dist * .05;
-
-      // avoid other
-      for (var other = 0; other < agents.length; ++other) {
-        if (other != index) {
-          otherAgent = agents[other];
-          dist = smoothstep(1., .5, distNoSqrt(agent.position, otherAgent.position));
-          dir = vectorFrom(otherAgent.position, agent.position);
-          offset.x += dir[0] * dist * .05;
-          offset.y += dir[1] * dist * .05;
-        }
-      }
-
-      otherAgent = player;
-      dist = distNoSqrt(agent.position, otherAgent.position);
-      dir = vectorFrom(otherAgent.position, agent.position);
       
-      // recycle with teleporting
-      if (dist > screenRangeNoSqrt) {
-        agent.position.x = player.position.x - dir[0] * .95;
-        agent.position.y = player.position.y - dir[1] * .95;
-        agent.target.x = agent.position.x + .001;
-        agent.target.y = agent.position.y + .001;
+      renderer.render(sceneStart, camera);
+
+    } else if (state == 1000) {
+
+      uniforms.uTransition.value = Math.max(0., Math.min(1., (elapsed - timer) / 3.));
+      renderer.render(sceneStart, camera);
+
+      if (uniforms.uTransition.value == 1.) {
+        state = 1;
+        timer = elapsed;
       }
 
-      // avoid player
-      dist = smoothstep(2., 1., dist);
-      offset.x += dir[0] * dist * .1;
-      offset.y += dir[1] * dist * .1;
+    } else if (state == 1) {
 
-      // inertia
-      offset.multiplyScalar(.1);
-      agent.velocity.add(offset);
-      agent.velocity.multiplyScalar(.99);
-      agent.position.add(agent.velocity);
+      uniforms.uTransition.value = Math.max(0., Math.min(1., (elapsed - timer) / 3.));
+
+      var x = Math.abs(point[0]-mouse.x/window.innerWidth);
+      var y = Math.abs(point[1]-mouse.y/window.innerHeight);
+
+      uniforms.uCursor.value[0] = x;
+      uniforms.uCursor.value[1] = y;
+
+      if (x + y < .01) {
+        state = 2;
+        timer = elapsed;
+        frame.record(renderer, scene, camera);
+        frame.swap();
+        frame.record(renderer, scene, camera);
+        uniforms.uFrame.value = frame.getTexture();
+        audio.stop();
+        audio.play();
+      }
+
+      renderer.render(scene, camera);
+
+    } else if (state == 2) {
+
+      uniforms.uTransition.value = Math.max(0., Math.min(1., (elapsed - timer) / 10.));
+
+      for (var step = 0; step < 3; ++step) {
+        frame.update(renderer);
+        uniforms.uFrame.value = frame.getTexture();
+      }
+
+      renderer.render(sceneTransition, camera);
+
+      if (uniforms.uTransition.value == 1.) {
+        state = 1;
+        round += 1;
+        timer = elapsed;
+        if (round == 3) {
+          state = 3;
+          uniforms.uGameOver.value = 1.;
+        } else {
+          updateGlitch();
+        }
+        buildTextures();
+      }
+
+    } else if (state == 3) {
+
+      uniforms.uTransition.value = 1.-Math.max(0., Math.min(1., (elapsed - timer) / 10.));
+
+      for (var step = 0; step < 3; ++step) {
+        frame.update(renderer);
+        uniforms.uFrame.value = frame.getTexture();
+      }
+
+      renderer.render(sceneTransition, camera);
+
     }
 
-    renderer.render(scene, camera);
   }
 
-  function onMove (x, y) {
-    mouse.x = x;
-    mouse.y = y;
-  }
-
-  function onClic (x, y) {
-    mouse.x = x;
-    mouse.y = y;
-    mouse.clic = true;
-    updateFrame(player, [1,4], [0,2]);
-  }
-
-  function onUnclic () {
-    mouse.clic = false;
-    updateFrame(player, [1,4], [0,1]);
-  }
-
-  function addAgent (count) {
-    for (var index = 0; index < count; ++index) {
-      var agent = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(1,1),
-        new THREE.MeshBasicMaterial({
-          map: textures['cursor'],
-          transparent: true,
-        }));
-      agent.position.x = (Math.random() * 2 - 1) * 5;
-      agent.position.y = (Math.random() * 2 - 1) * 5;
-      agent.target = new THREE.Vector3(agent.position.x + .0001, agent.position.y + .0001, agent.position.z);
-      agent.velocity = new THREE.Vector3();
-      updateFrame(agent, [1,4], [0,1]);
-      scene.add(agent);
-      agents.push(agent);
-    }
-  }
-
-  function addColliders (count) {
-    for (var index = 0; index < count; ++index) {
-      var collider = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(1,1),
-        new THREE.MeshBasicMaterial({
-          color: 0xff0000,
-      }));
-      collider.position.x = (Math.random() * 2 - 1) * 5;
-      collider.position.y = (Math.random() * 2 - 1) * 5;
-      collider.scale.x = 2;
-      collider.scale.y = 4;
-      scene.add(collider);
-      colliders.push(collider);
-    }
-  }
-
-  function randomTarget () {
-    for (var index = 0; index < agents.length; ++index) {
-      var agent = agents[index];
-      agent.target = new THREE.Vector3(
-        player.position.x + (Math.random() * 2 - 1) * 5,
-        player.position.y + (Math.random() * 2 - 1) * 5,
-        agent.position.z);
-    }
-  }
-
-  function updateFrame (mesh, slices, offset) {
-    var uvs = mesh.geometry.attributes.uv.array;
-    for (var index = 0; index < uvs.length; ++index) {
-      uvs[index] = (defaultUV[index] + offset[index%2]) / slices[index%2];
-    }
-    mesh.geometry.attributes.uv.needsUpdate = true;
-  }
-
-  function onMouseMove (event) { onMove(event.clientX, event.clientY); }
-  function onMouseDown (event) { onClic(event.clientX, event.clientY) }
-  function onMouseUp (event)   { onUnclic(); }
-  function onTouchMove (event) {
-    event.preventDefault();
-    onMove(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
-  }
-  function onTouchDown (event) {
-    event.preventDefault();
-    onClic(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
-  }
-  function onTouchUp (event) {
-    event.preventDefault();
-    onUnclic();
+  function updateGlitch() {
+    scene.material.fragmentShader = assets['glitch-' + round];
+    scene.material.needsUpdate = true;
   }
 
   function resize () {
     var width = window.innerWidth;
     var height = window.innerHeight;
-    screen = {
-      width: width,
-      height: height,
-      center: { x: width / 2, y: height / 2 },
-    };
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize( width, height );
+    renderer.setSize(width, height);
+    uniforms.uResolution.value = [width, height];
+    frame.setSize(width, height);
+    buildTextures();
+  }
+
+  function buildTextures () {
+
+    uniforms.uText.value = textureFromText([{
+      text: 'GPU',
+      font: 'bebasneue',
+      fontSize: window.innerHeight/3,
+      textBaseline: 'top',
+      anchor: [.5, 0],
+    },{
+      text: 'GLITCH PROCESSING UNIT',
+      font: 'bebasneue',
+      fontSize: window.innerHeight/21,
+      textBaseline: 'top',
+      offsetY: window.innerHeight/3,
+      anchor: [.5, 0],
+    },{
+      text: 'USE BUTTONS TO RECALIBRATE GLITCHES',
+      font: 'bebasneue',
+      fontSize: window.innerHeight/15,
+    },{
+      text: 'START',
+      font: 'bebasneue',
+      fontSize: window.innerHeight/10,
+      anchor: [.5, .75],
+    },{
+      text: 'TATIANA VILELA & LEON DENISE',
+      font: 'bebasneue',
+      textBaseline: 'bottom',
+      fontSize: window.innerHeight/20,
+      offsetY: -window.innerHeight/40,
+      anchor: [.5, 1.],
+    }])
+
+    uniforms.uTextMask.value = textureFromRect([{
+      x: 0,
+      y: 0,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      fillStyle: 'black',
+    },{
+      x: 0,
+      y: 0,
+      width: window.innerWidth,
+      height: window.innerHeight / 3,
+      fillStyle: 'red',
+    }])
+
+    if (uniforms.uGameOver.value == 0.) {
+      uniforms.uTextWin.value = textureFromText([{
+        text: 'YES',
+        font: 'bebasneue',
+        fontSize: window.innerHeight/3,
+      }]);
+    } else {
+      uniforms.uTextWin.value = textureFromText([{
+        text: 'THANKS FOR PLAYING',
+        font: 'bebasneue',
+        textBaseline: 'top',
+        fontSize: window.innerHeight/10,
+        anchor: [.5, .05],
+      },{
+        text: 'PRESS BUTTON TO RESTART',
+        font: 'bebasneue',
+        textBaseline: 'bottom',
+        fontSize: window.innerHeight/15,
+        anchor: [.5, .95],
+      }]);
+    }
   }
 }

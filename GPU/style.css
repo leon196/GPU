@@ -16,3 +16,24 @@ canvas
 	height: 100%;
 	margin: 0 auto;
 }
+
+@font-face {
+	font-family: 'bebasneue';
+	src: url('fonts/bebasneue.woff2') format('woff2'),
+	url('fonts/bebasneue.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'bebasneue-bold';
+	src: url('fonts/bebasneue-bold.woff2') format('woff2'),
+	url('fonts/bebasneue-bold.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.hide {
+	visibility: hidden;
+	position: absolute;
+}
