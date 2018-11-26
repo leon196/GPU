@@ -23,11 +23,8 @@ vec3 hsv2rgb(vec3 c) {
 void main () {
   vec2 uv = vUv;
   vec2 unit = 1. / uResolution;
+  uv.x = mix(uv.x, max(uv.x, texture2D(uVideo, vec2(.5,uv.y)).r), uCursor.x);
+  uv.y = mix(uv.y, max(uv.y, texture2D(uVideo, vec2(uv.x, .5)).r), uCursor.y);
   vec4 media = texture2D(uVideo, uv);
-  float l = luminance(media);
-  float a = l * 3.14159 * 2.;
-  uv += vec2(cos(a), sin(a)) * unit * 1000. * uCursor.x;
-  media = texture2D(uVideo, uv);
-  media.rgb = hsv2rgb(rgb2hsv(media.rgb)+vec3(l,l,l)*4.*uCursor.y);
   gl_FragColor = media * uTransition;
 }

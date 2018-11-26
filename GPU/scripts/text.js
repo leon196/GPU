@@ -1,4 +1,69 @@
 
+
+
+function buildTextures (uniforms) {
+
+  uniforms.uText.value = textureFromText([{
+    text: 'GPU',
+    font: 'bebasneue',
+    fontSize: window.innerHeight/2,
+    anchor: [.5, .4],
+  },{
+    text: 'GLITCH PROCESSING UNIT',
+    font: 'bebasneue',
+    fontSize: window.innerHeight/13,
+    anchor: [.5, .65],
+  },{
+    text: 'BY TATIANA VILELA & LEON DENISE',
+    font: 'bebasneue',
+    textBaseline: 'top',
+    offsetY: window.innerHeight/18,
+    fontSize: window.innerHeight/18,
+    anchor: [.5, .65],
+  },{
+    text: 'PRESS BUTTONS TO CALIBRATE GLITCHES',
+    font: 'bebasneue',
+    fontSize: window.innerHeight/15,
+    anchor: [.5, .85],
+  }])
+
+  uniforms.uTextMask.value = textureFromRect([{
+    x: 0,
+    y: 0,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    fillStyle: 'black',
+  },{
+    x: 0,
+    y: 0,
+    width: window.innerWidth,
+    height: window.innerHeight / 1.8,
+    fillStyle: 'red',
+  }])
+
+  if (uniforms.uGameOver.value == 0.) {
+    uniforms.uTextWin.value = textureFromText([{
+      text: 'YES',
+      font: 'bebasneue',
+      fontSize: window.innerHeight/3,
+    }]);
+  } else {
+    uniforms.uTextWin.value = textureFromText([{
+      text: 'THANKS FOR PLAYING',
+      font: 'bebasneue',
+      textBaseline: 'top',
+      fontSize: window.innerHeight/10,
+      anchor: [.5, .05],
+    },{
+      text: 'PRESS BUTTON TO RESTART',
+      font: 'bebasneue',
+      textBaseline: 'bottom',
+      fontSize: window.innerHeight/15,
+      anchor: [.5, .95],
+    }]);
+  }
+}
+
 function createTextCanvas(segments)
 {
 	var ctx = document.createElement('canvas').getContext('2d');

@@ -28,6 +28,8 @@ function FrameBuffer (options) {
 
 	this.record = function (renderer, scene, camera) {
 		renderer.render(scene, camera, this.getRenderTarget(), true);
+		this.swap();
+		renderer.render(scene, camera, this.getRenderTarget(), true);
 	}
 
 	this.getRenderTarget = function () {

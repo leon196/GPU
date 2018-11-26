@@ -20,7 +20,9 @@ void main ()
 
 	// Scanline
 	float random1 = random(pixelize(uv - vec2(0, uTime * .01), pow(2.0, 10.0)).yy);
-	float random2 = random(pixelize(uv + vec2(0, uTime * .01), pow(2.0, 6.0)).yy) * 0.025 * random1;
+	float random2 = random(pixelize(uv + vec2(0, uTime * .01), pow(2.0, 6.0)).yy);
+	random2 = random2 * 2. - 1.;
+	random2 *= 0.01 * random1;
 	uv.x += random2 * mix(.1, 1., should);
 
 	// RGB 

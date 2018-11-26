@@ -10,5 +10,5 @@ vec2 pixelize(vec2 uv, float details) { return floor(uv * details) / details; }
 vec2 pixelize(vec2 uv, vec2 details) { return floor(uv * details) / details; }
 
 void main () {
-	gl_FragColor = texture2D(uFrame, vUv) * (1.-smoothstep(.9, 1., uTransition));
+	gl_FragColor = texture2D(uFrame, vUv) * uTransition;
 }
