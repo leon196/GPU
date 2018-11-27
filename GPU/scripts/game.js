@@ -11,8 +11,8 @@ window.onload = function () {
 		OverTransition: 5,
 	}
 	
-	state = State.Game;
-	round = 9;
+	state = State.Title;
+	round = 1;
 	total = 9;
 	timer = 0;
 
@@ -173,8 +173,10 @@ window.onload = function () {
 				uniforms.uCursor.value[0] = 0;
 				uniforms.uCursor.value[1] = 0;
 				timer = elapsed;
-				frame.record(renderer, scene, camera);
-				uniforms.uFrame.value = frame.getTexture();
+				frame.setSize(window.innerWidth+1, window.innerHeight+1);
+				frame.setSize(window.innerWidth, window.innerHeight);
+				// frame.record(renderer, scene, camera);
+				// uniforms.uFrame.value = frame.getTexture();
 				audio.playFX();
 			}
 

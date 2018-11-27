@@ -44,6 +44,6 @@ void main () {
 		frame,
 		frameVideo,
 		uGameOver);
-	
+
 	gl_FragColor.rgb = mix(gl_FragColor.rgb, text.rgb, text.a);
 }
