@@ -29,7 +29,7 @@ void main () {
 	vec4 frame = texture2D(uFrame, vUv);
 
 	vec2 uv = vUv;
-	vec2 unit = 1.5 / uResolution;
+	vec2 unit = 1. / uResolution;
 	float a = 2. * 3.1415 * luminance(video);
 	a += 2. * 3.1415 * luminance(frame);
 	a += uTime * .1;

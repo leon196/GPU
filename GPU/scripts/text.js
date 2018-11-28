@@ -7,24 +7,26 @@ function buildTextures (uniforms) {
     text: 'GPU',
     font: 'bebasneue',
     fontSize: window.innerHeight/2,
-    anchor: [.5, .4],
+    anchor: [.5, .5],
   },{
     text: 'GLITCH PROCESSING UNIT',
     font: 'bebasneue',
+    textBaseline: 'top',
     fontSize: window.innerHeight/13,
     anchor: [.5, .65],
   },{
-    text: 'BY TATIANA VILELA & LEON DENISE',
+    text: 'TATIANA VILELA DOS SANTOS & LEON DENISE PRESENT',
     font: 'bebasneue',
     textBaseline: 'top',
     offsetY: window.innerHeight/18,
-    fontSize: window.innerHeight/18,
-    anchor: [.5, .65],
-  },{
-    text: 'PRESS BUTTONS TO CALIBRATE GLITCHES',
-    font: 'bebasneue',
     fontSize: window.innerHeight/15,
-    anchor: [.5, .85],
+    anchor: [.5, .0],
+  },{
+    text: 'FIND THE BUTTONS TO FIX THE GLITCHES',
+    font: 'bebasneue',
+    textBaseline: 'bottom',
+    fontSize: window.innerHeight/15,
+    anchor: [.5, .95],
   }])
 
   uniforms.uTextMask.value = textureFromRect([{
@@ -37,29 +39,30 @@ function buildTextures (uniforms) {
     x: 0,
     y: 0,
     width: window.innerWidth,
-    height: window.innerHeight / 1.8,
+    height: window.innerHeight / 1.5,
     fillStyle: 'red',
   }])
 
   if (uniforms.uGameOver.value == 0.) {
     uniforms.uTextWin.value = textureFromText([{
-      text: 'YES',
+      // text: 'GIMME MORE',
+      // text: 'GO FASTER',
+      text: 'DO IT!',
       font: 'bebasneue',
       fontSize: window.innerHeight/3,
     }]);
   } else {
     uniforms.uTextWin.value = textureFromText([{
-      text: 'THANKS FOR PLAYING',
-      font: 'bebasneue',
-      textBaseline: 'top',
-      fontSize: window.innerHeight/10,
-      anchor: [.5, .05],
-    },{
-      text: 'PRESS BUTTON TO RESTART',
+      text: 'THANKS FOR YOUR BRAIN TIME',
       font: 'bebasneue',
       textBaseline: 'bottom',
-      fontSize: window.innerHeight/15,
-      anchor: [.5, .95],
+      fontSize: window.innerHeight/10,
+      anchor: [.5, .5],
+    },{
+      text: 'PRESS BUTTON TO RESET',
+      font: 'bebasneue',
+      fontSize: window.innerHeight/12,
+      anchor: [.5, .75],
     }]);
   }
 }

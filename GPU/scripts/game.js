@@ -6,9 +6,10 @@ window.onload = function () {
 		Title: 0,
 		TitleTransition: 1,
 		Game: 2,
-		Transition: 3,
-		Over: 4,
-		OverTransition: 5,
+		Video: 3,
+		Transition: 4,
+		Over: 5,
+		OverTransition: 6,
 	}
 	
 	state = State.Title;
@@ -73,7 +74,7 @@ window.onload = function () {
 		scene.material.uniforms = uniforms;
 
 		video = document.createElement('video');
-		video.src = 'videos/talking-heads.mp4';
+		video.src = 'videos/video.mp4';
 		video.muted = true;
 		video.autoplay = true;
 		video.loop = true;
@@ -126,6 +127,8 @@ window.onload = function () {
 
 		var anyKey = Keyboard.Left.down || Keyboard.Up.down || Keyboard.Right.down || Keyboard.Down.down;
 
+		// restart at 60 secondes
+
 		if (state == State.Title) {
 
 			uniforms.uTransition.value = 1.-Math.max(0., Math.min(1., (elapsed - timer) / 3.));
@@ -168,18 +171,27 @@ window.onload = function () {
 			uniforms.uCursor.value[1] = y;
 
 			if (x + y < .005) {
-				state = State.Transition;
+				state = State.Video;
 				cursor = [0, 0];
 				uniforms.uCursor.value[0] = 0;
 				uniforms.uCursor.value[1] = 0;
 				timer = elapsed;
-				frame.setSize(window.innerWidth+1, window.innerHeight+1);
-				frame.setSize(window.innerWidth, window.innerHeight);
-				// frame.record(renderer, scene, camera);
-				// uniforms.uFrame.value = frame.getTexture();
-				audio.playFX();
 			}
 
+			renderer.render(scene, camera);
+
+		} else if (state == State.Video) {
+
+			var t = Math.max(0., Math.min(1., (elapsed - timer) / 1.));
+			if (t == 1.) {
+				state = State.Transition;
+				timer = elapsed;
+				frame.setSize(window.innerWidth+1, window.innerHeight+1);
+				frame.setSize(window.innerWidth, window.innerHeight);
+				frame.record(renderer, scene, camera);
+				uniforms.uFrame.value = frame.getTexture();
+				audio.playFX();
+			}
 			renderer.render(scene, camera);
 
 		} else if (state == State.Transition) {
@@ -188,10 +200,10 @@ window.onload = function () {
 
 			uniforms.uTransition.value = 1.-smoothstep(.9, 1., t);
 
-			for (var step = 0; step < 3; ++step) {
+			// for (var step = 0; step < 3; ++step) {
 				frame.update(renderer);
 				uniforms.uFrame.value = frame.getTexture();
-			}
+			// }
 
 			renderer.render(sceneTransition, camera);
 
@@ -213,10 +225,10 @@ window.onload = function () {
 
 			uniforms.uTransition.value = Math.max(0., Math.min(1., (elapsed - timer) / 3.));
 
-			for (var step = 0; step < 3; ++step) {
+			// for (var step = 0; step < 3; ++step) {
 				frame.update(renderer);
 				uniforms.uFrame.value = frame.getTexture();
-			}
+			// }
 
 			if (uniforms.uTransition.value == 1) {
 				if (anyKey) {
@@ -232,10 +244,10 @@ window.onload = function () {
 
 			uniforms.uTransition.value = 1.-Math.max(0., Math.min(1., (elapsed - timer) / 3.));
 
-			for (var step = 0; step < 3; ++step) {
+			// for (var step = 0; step < 3; ++step) {
 				frame.update(renderer);
 				uniforms.uFrame.value = frame.getTexture();
-			}
+			// }
 
 			if (uniforms.uTransition.value == 0) {
 				state = State.Title;

@@ -16,7 +16,8 @@ void main ()
 	vec2 uv = vUv;
 
 	float hover = uHover * step(abs(uv.x-.5), .15) * step(abs(uv.y-.25), .1);
-	float should = texture2D(uTextMask, vUv).r + hover;
+	// float should = texture2D(uTextMask, vUv).r + hover;
+	float should = step(.35, vUv.y) * step(vUv.y, .85) + hover;
 
 	// Scanline
 	float random1 = random(pixelize(uv - vec2(0, uTime * .01), pow(2.0, 10.0)).yy);
